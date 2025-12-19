@@ -28,7 +28,7 @@ vi.mock('@ai-sdk/openai', () => ({
 }))
 
 describe('cli json + cost report', () => {
-  it('prints cost lines to stderr when --json --cost', async () => {
+  it('prints cost lines to stderr when --json --metrics detailed', async () => {
     const root = mkdtempSync(join(tmpdir(), 'summarize-json-cost-'))
     const cacheDir = join(root, '.summarize', 'cache')
     mkdirSync(cacheDir, { recursive: true })
@@ -77,7 +77,16 @@ describe('cli json + cost report', () => {
     })
 
     await runCli(
-      ['--json', '--cost', '--model', 'openai/gpt-5.2', '--timeout', '10s', 'https://example.com'],
+      [
+        '--json',
+        '--metrics',
+        'detailed',
+        '--model',
+        'openai/gpt-5.2',
+        '--timeout',
+        '10s',
+        'https://example.com',
+      ],
       {
         env: { HOME: root, OPENAI_API_KEY: 'test' },
         fetch: fetchMock as unknown as typeof fetch,
