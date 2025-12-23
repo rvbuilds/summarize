@@ -1,4 +1,4 @@
-import { mkdtempSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Writable } from 'node:stream'
@@ -26,18 +26,28 @@ vi.mock('../src/llm/generate-text.js', () => ({
   }),
 }))
 
-describe('--model free no silent fallback', () => {
-  it('throws instead of returning extracted text when model fails', async () => {
-    const root = mkdtempSync(join(tmpdir(), 'summarize-free-no-fallback-'))
+describe('model bags: no silent fallback', () => {
+  it('throws instead of returning extracted text when the bag fails', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'summarize-bag-no-fallback-'))
     const filePath = join(root, 'input.txt')
     writeFileSync(filePath, 'hello world', 'utf8')
+    mkdirSync(join(root, '.summarize'), { recursive: true })
+    writeFileSync(
+      join(root, '.summarize', 'config.json'),
+      JSON.stringify({
+        bags: {
+          free: { mode: 'auto', rules: [{ candidates: ['openai/gpt-5-mini'] }] },
+        },
+      }),
+      'utf8'
+    )
 
     const stdout = collectStream()
     const stderr = collectStream()
 
     await expect(
       runCli(['--model', 'free', '--max-output-tokens', '500', '--render', 'plain', filePath], {
-        env: { HOME: root, OPENROUTER_API_KEY: 'test' },
+        env: { HOME: root, OPENAI_API_KEY: 'test' },
         fetch: async () => {
           throw new Error('unexpected fetch')
         },
