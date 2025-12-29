@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { generateTextWithModelId } from '../../src/llm/generate-text.js'
-import { buildAnthropicDocumentPrompt } from '../../src/llm/prompt.js'
+import { buildDocumentPrompt } from '../../src/llm/prompt.js'
 
 const LIVE = process.env.SUMMARIZE_LIVE_TEST === '1'
 
@@ -73,7 +73,7 @@ function buildMinimalPdf(text: string): Uint8Array {
             anthropicApiKey,
             openrouterApiKey: null,
           },
-          prompt: buildAnthropicDocumentPrompt({
+          prompt: buildDocumentPrompt({
             text: 'Summarize the attached PDF in one sentence.',
             document: {
               bytes: pdfBytes,
