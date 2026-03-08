@@ -2,7 +2,6 @@ import { randomUUID } from "node:crypto";
 import { promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { transcribeWithAssemblyAi, transcribeFileWithAssemblyAi } from "./assemblyai.js";
 import {
   cloudProviderLabel,
   formatCloudFallbackTargets,
@@ -10,13 +9,14 @@ import {
   type CloudProvider,
 } from "./cloud-providers.js";
 import { DEFAULT_SEGMENT_SECONDS, MAX_OPENAI_UPLOAD_BYTES } from "./constants.js";
-import { transcribeWithFal } from "./fal.js";
-import { isFfmpegAvailable, transcodeBytesToMp3 } from "./ffmpeg.js";
-import { transcribeFileWithGemini, transcribeWithGemini } from "./gemini.js";
-import { shouldRetryOpenAiViaFfmpeg, transcribeWithOpenAi } from "./openai.js";
+import { isFfmpegAvailable } from "./ffmpeg.js";
 import { buildMissingTranscriptionProviderMessage } from "./provider-setup.js";
+import {
+  attemptRemoteBytesProvider,
+  attemptRemoteFileProvider,
+} from "./remote-provider-attempts.js";
 import type { WhisperProgressEvent, WhisperTranscriptionResult } from "./types.js";
-import { formatBytes, readFirstBytes, wrapError } from "./utils.js";
+import { formatBytes, readFirstBytes } from "./utils.js";
 
 type Env = Record<string, string | undefined>;
 
@@ -107,131 +107,36 @@ async function transcribeBytesAcrossProviders({
   let lastFailure: FailedAttempt | null = null;
 
   for (const [index, provider] of providerOrder.entries()) {
-    let error: Error | null = null;
+    const attempt = await attemptRemoteBytesProvider({
+      provider,
+      state: {
+        bytes: currentBytes,
+        mediaType: currentMediaType,
+        filename: currentFilename,
+      },
+      assemblyaiApiKey,
+      geminiApiKey,
+      openaiApiKey,
+      falApiKey,
+      env,
+      notes,
+      onProgress,
+      transcribeOversizedBytesWithChunking,
+    });
+    currentBytes = attempt.state.bytes;
+    currentMediaType = attempt.state.mediaType;
+    currentFilename = attempt.state.filename;
+    if (attempt.result) return withMergedNotes(attempt.result, notes);
+    if (!attempt.error) continue;
 
-    if (provider === "assemblyai") {
-      try {
-        const text = await transcribeWithAssemblyAi(
-          currentBytes,
-          currentMediaType,
-          assemblyaiApiKey!,
-        );
-        if (text) return { text, provider: "assemblyai", error: null, notes };
-        error = new Error("AssemblyAI transcription returned empty text");
-      } catch (caught) {
-        error =
-          caught instanceof Error ? caught : wrapError("AssemblyAI transcription failed", caught);
-      }
-    }
-
-    if (provider === "gemini") {
-      try {
-        const text = await transcribeWithGemini(
-          currentBytes,
-          currentMediaType,
-          currentFilename,
-          geminiApiKey!,
-          { env },
-        );
-        if (text) return { text, provider: "gemini", error: null, notes };
-        error = new Error("Gemini transcription returned empty text");
-      } catch (caught) {
-        error = wrapError("Gemini transcription failed", caught);
-      }
-    }
-
-    if (provider === "openai") {
-      if (
-        currentBytes.byteLength > MAX_OPENAI_UPLOAD_BYTES &&
-        transcribeOversizedBytesWithChunking &&
-        openaiApiKey
-      ) {
-        const canChunk = await isFfmpegAvailable();
-        if (canChunk) {
-          return withMergedNotes(
-            await transcribeOversizedBytesWithChunking({
-              bytes: currentBytes,
-              mediaType: currentMediaType,
-              filename: currentFilename,
-              onProgress,
-            }),
-            notes,
-          );
-        }
-        notes.push(
-          `Media too large for Whisper upload (${formatBytes(currentBytes.byteLength)}); transcribing first ${formatBytes(MAX_OPENAI_UPLOAD_BYTES)} only (install ffmpeg for full transcription)`,
-        );
-        currentBytes = currentBytes.slice(0, MAX_OPENAI_UPLOAD_BYTES);
-      }
-
-      try {
-        const text = await transcribeWithOpenAi(
-          currentBytes,
-          currentMediaType,
-          currentFilename,
-          openaiApiKey!,
-          { env },
-        );
-        if (text) return { text, provider: "openai", error: null, notes };
-        error = new Error("OpenAI transcription returned empty text");
-      } catch (caught) {
-        error = wrapError("OpenAI transcription failed", caught);
-      }
-
-      if (error && shouldRetryOpenAiViaFfmpeg(error)) {
-        const canTranscode = await isFfmpegAvailable();
-        if (canTranscode) {
-          try {
-            notes.push("OpenAI could not decode media; transcoding via ffmpeg and retrying");
-            const mp3Bytes = await transcodeBytesToMp3(currentBytes);
-            const retried = await transcribeWithOpenAi(
-              mp3Bytes,
-              "audio/mpeg",
-              "audio.mp3",
-              openaiApiKey!,
-              { env },
-            );
-            if (retried) return { text: retried, provider: "openai", error: null, notes };
-            error = new Error("OpenAI transcription returned empty text after ffmpeg transcode");
-            currentBytes = mp3Bytes;
-            currentMediaType = "audio/mpeg";
-            currentFilename = "audio.mp3";
-          } catch (caught) {
-            notes.push(
-              `ffmpeg transcode failed; cannot retry OpenAI decode error: ${
-                caught instanceof Error ? caught.message : String(caught)
-              }`,
-            );
-          }
-        } else {
-          notes.push("OpenAI could not decode media; install ffmpeg to enable transcoding retry");
-        }
-      }
-    }
-
-    if (provider === "fal") {
-      if (!currentMediaType.toLowerCase().startsWith("audio/")) {
-        notes.push(`Skipping FAL transcription: unsupported mediaType ${currentMediaType}`);
-        continue;
-      }
-      try {
-        const text = await transcribeWithFal(currentBytes, currentMediaType, falApiKey!);
-        if (text) return { text, provider: "fal", error: null, notes };
-        error = new Error("FAL transcription returned empty text");
-      } catch (caught) {
-        error = wrapError("FAL transcription failed", caught);
-      }
-    }
-
-    if (!error) continue;
-    lastFailure = { provider, error };
+    lastFailure = { provider, error: attempt.error };
     const remaining = providerOrder.slice(index + 1).filter((candidate) => {
       if (candidate !== "fal") return true;
       return currentMediaType.toLowerCase().startsWith("audio/");
     });
     if (remaining.length > 0) {
       notes.push(
-        `${cloudProviderLabel(provider, false)} transcription failed; falling back to ${formatCloudFallbackTargets(remaining)}: ${error.message}`,
+        `${cloudProviderLabel(provider, false)} transcription failed; falling back to ${formatCloudFallbackTargets(remaining)}: ${attempt.error.message}`,
       );
     }
   }
@@ -353,40 +258,17 @@ export async function transcribeFileWithRemoteFallbacks({
   let lastFailure: FailedAttempt | null = null;
 
   for (const [index, provider] of providerOrder.entries()) {
-    let error: Error | null = null;
-
-    if (provider === "assemblyai") {
-      try {
-        const text = await transcribeFileWithAssemblyAi({
-          filePath,
-          mediaType,
-          apiKey: assemblyaiApiKey!,
-        });
-        if (text) return { text, provider: "assemblyai", error: null, notes };
-        error = new Error("AssemblyAI transcription returned empty text");
-      } catch (caught) {
-        error =
-          caught instanceof Error ? caught : wrapError("AssemblyAI transcription failed", caught);
-      }
-    }
-
-    if (provider === "gemini") {
-      try {
-        const text = await transcribeFileWithGemini({
-          filePath,
-          mediaType,
-          filename,
-          apiKey: geminiApiKey!,
-          env,
-        });
-        if (text) return { text, provider: "gemini", error: null, notes };
-        error = new Error("Gemini transcription returned empty text");
-      } catch (caught) {
-        error = wrapError("Gemini transcription failed", caught);
-      }
-    }
-
-    if (provider === "openai" || provider === "fal") {
+    const fileAttempt = await attemptRemoteFileProvider({
+      provider,
+      filePath,
+      mediaType,
+      filename,
+      assemblyaiApiKey,
+      geminiApiKey,
+      env,
+    });
+    if (fileAttempt.kind === "result") return withMergedNotes(fileAttempt.result, notes);
+    if (fileAttempt.kind === "delegate-to-bytes") {
       if (provider === "openai" && stat.size > MAX_OPENAI_UPLOAD_BYTES) {
         const canChunk = await isFfmpegAvailable();
         if (canChunk) {
@@ -423,7 +305,6 @@ export async function transcribeFileWithRemoteFallbacks({
           notes,
         );
       }
-
       return withMergedNotes(
         await transcribeBytesAcrossProviders({
           providerOrder: providerOrder.slice(index),
@@ -443,13 +324,11 @@ export async function transcribeFileWithRemoteFallbacks({
         notes,
       );
     }
-
-    if (!error) continue;
-    lastFailure = { provider, error };
+    lastFailure = { provider, error: fileAttempt.error };
     const remaining = providerOrder.slice(index + 1);
     if (remaining.length > 0) {
       notes.push(
-        `${cloudProviderLabel(provider, false)} transcription failed; falling back to ${formatCloudFallbackTargets(remaining)}: ${error.message}`,
+        `${cloudProviderLabel(provider, false)} transcription failed; falling back to ${formatCloudFallbackTargets(remaining)}: ${fileAttempt.error.message}`,
       );
     }
   }
