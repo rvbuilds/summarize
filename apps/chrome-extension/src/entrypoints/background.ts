@@ -22,6 +22,13 @@ import { logExtensionEvent } from "../lib/extension-logs";
 import { loadSettings, patchSettings } from "../lib/settings";
 import { parseSseStream } from "../lib/sse";
 import { isYouTubeWatchUrl } from "../lib/youtube-url";
+import {
+  canSummarizeUrl,
+  extractFromTab,
+  seekInTab,
+  type ExtractResponse,
+} from "./background/content-script-bridge";
+import { daemonHealth, daemonPing, friendlyFetchError } from "./background/daemon-client";
 
 type PanelToBg =
   | { type: "panel:ready" }
@@ -139,21 +146,6 @@ type UiState = {
   status: string;
 };
 
-type ExtractRequest = { type: "extract"; maxChars: number };
-type SeekRequest = { type: "seek"; seconds: number };
-type ExtractResponse =
-  | {
-      ok: true;
-      url: string;
-      title: string | null;
-      text: string;
-      truncated: boolean;
-      mediaDurationSeconds?: number | null;
-      media?: { hasVideo: boolean; hasAudio: boolean; hasCaptions: boolean };
-    }
-  | { ok: false; error: string };
-type SeekResponse = { ok: true } | { ok: false; error: string };
-
 type SlidesPayload = {
   sourceUrl: string;
   sourceId: string;
@@ -203,18 +195,6 @@ const optionsWindowMargin = 20;
 const MIN_CHAT_CHARS = 100;
 const CHAT_FULL_TRANSCRIPT_MAX_CHARS = Number.MAX_SAFE_INTEGER;
 const MAX_SLIDE_OCR_CHARS = 8000;
-const DAEMON_STATUS_TIMEOUT_MS = 5000;
-const DAEMON_STATUS_RETRY_DELAY_MS = 400;
-const DAEMON_STATUS_MAX_ATTEMPTS = 2;
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const shouldRetryDaemon = (err: unknown) => {
-  if (err instanceof DOMException && err.name === "AbortError") return true;
-  const message = err instanceof Error ? err.message : "";
-  return message.toLowerCase() === "failed to fetch";
-};
-
 const formatSlideTimestamp = (seconds: number): string => {
   const safe = Math.max(0, Math.floor(seconds));
   const h = Math.floor(safe / 3600);
@@ -280,16 +260,6 @@ async function openOptionsWindow() {
   void chrome.runtime.openOptionsPage();
 }
 
-function canSummarizeUrl(url: string | undefined): url is string {
-  if (!url) return false;
-  if (url.startsWith("chrome://")) return false;
-  if (url.startsWith("chrome-extension://")) return false;
-  if (url.startsWith("moz-extension://")) return false; // Firefox extension pages
-  if (url.startsWith("edge://")) return false;
-  if (url.startsWith("about:")) return false;
-  return true;
-}
-
 async function getActiveTab(windowId?: number): Promise<chrome.tabs.Tab | null> {
   const [tab] = await chrome.tabs.query(
     typeof windowId === "number"
@@ -297,81 +267,6 @@ async function getActiveTab(windowId?: number): Promise<chrome.tabs.Tab | null> 
       : { active: true, currentWindow: true },
   );
   return tab ?? null;
-}
-
-async function daemonHealth(): Promise<{ ok: boolean; error?: string }> {
-  for (let attempt = 0; attempt < DAEMON_STATUS_MAX_ATTEMPTS; attempt += 1) {
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), DAEMON_STATUS_TIMEOUT_MS);
-      const res = await fetch("http://127.0.0.1:8787/health", { signal: controller.signal });
-      clearTimeout(timeout);
-      if (!res.ok) return { ok: false, error: `${res.status} ${res.statusText}` };
-      return { ok: true };
-    } catch (err) {
-      const shouldRetry = attempt < DAEMON_STATUS_MAX_ATTEMPTS - 1 && shouldRetryDaemon(err);
-      if (shouldRetry) {
-        await sleep(DAEMON_STATUS_RETRY_DELAY_MS * (attempt + 1));
-        continue;
-      }
-      if (err instanceof DOMException && err.name === "AbortError") {
-        return { ok: false, error: "Timed out" };
-      }
-      const message = err instanceof Error ? err.message : "health failed";
-      if (message.toLowerCase() === "failed to fetch") {
-        return {
-          ok: false,
-          error:
-            "Failed to fetch (daemon unreachable or blocked by Chrome; try `summarize daemon status` and check ~/.summarize/logs/daemon.err.log)",
-        };
-      }
-      return { ok: false, error: message };
-    }
-  }
-  return { ok: false, error: "Timed out" };
-}
-
-async function daemonPing(token: string): Promise<{ ok: boolean; error?: string }> {
-  for (let attempt = 0; attempt < DAEMON_STATUS_MAX_ATTEMPTS; attempt += 1) {
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), DAEMON_STATUS_TIMEOUT_MS);
-      const res = await fetch("http://127.0.0.1:8787/v1/ping", {
-        headers: { Authorization: `Bearer ${token}` },
-        signal: controller.signal,
-      });
-      clearTimeout(timeout);
-      if (!res.ok) return { ok: false, error: `${res.status} ${res.statusText}` };
-      return { ok: true };
-    } catch (err) {
-      const shouldRetry = attempt < DAEMON_STATUS_MAX_ATTEMPTS - 1 && shouldRetryDaemon(err);
-      if (shouldRetry) {
-        await sleep(DAEMON_STATUS_RETRY_DELAY_MS * (attempt + 1));
-        continue;
-      }
-      if (err instanceof DOMException && err.name === "AbortError") {
-        return { ok: false, error: "Timed out" };
-      }
-      const message = err instanceof Error ? err.message : "ping failed";
-      if (message.toLowerCase() === "failed to fetch") {
-        return {
-          ok: false,
-          error:
-            "Failed to fetch (daemon unreachable or blocked by Chrome; try `summarize daemon status`)",
-        };
-      }
-      return { ok: false, error: message };
-    }
-  }
-  return { ok: false, error: "Timed out" };
-}
-
-function friendlyFetchError(err: unknown, context: string): string {
-  const message = err instanceof Error ? err.message : String(err);
-  if (message.toLowerCase() === "failed to fetch") {
-    return `${context}: Failed to fetch (daemon unreachable or blocked by Chrome; try \`summarize daemon status\` and check ~/.summarize/logs/daemon.err.log)`;
-  }
-  return `${context}: ${message}`;
 }
 
 function normalizeUrl(value: string) {
@@ -395,171 +290,6 @@ function urlsMatch(a: string, b: string) {
     return next === "/" || next === "?" || next === "&";
   };
   return boundaryMatch(left, right) || boundaryMatch(right, left);
-}
-
-async function extractFromTab(
-  tabId: number,
-  maxChars: number,
-  opts?: {
-    timeoutMs?: number;
-    log?: (event: string, detail?: Record<string, unknown>) => void;
-  },
-): Promise<{ ok: true; data: ExtractResponse & { ok: true } } | { ok: false; error: string }> {
-  const req = { type: "extract", maxChars } satisfies ExtractRequest;
-  const timeoutMs = opts?.timeoutMs ?? 6_000;
-
-  const sendMessageWithTimeout = async (): Promise<ExtractResponse> => {
-    const start = Date.now();
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    try {
-      const res = (await Promise.race([
-        chrome.tabs.sendMessage(tabId, req) as Promise<ExtractResponse>,
-        new Promise<never>((_resolve, reject) => {
-          timer = setTimeout(
-            () => reject(new Error(`extract timed out after ${timeoutMs}ms`)),
-            timeoutMs,
-          );
-        }),
-      ])) as ExtractResponse;
-      if (timer) clearTimeout(timer);
-      opts?.log?.("extract:message:ok", { elapsedMs: Date.now() - start });
-      return res;
-    } catch (err) {
-      if (timer) clearTimeout(timer);
-      opts?.log?.("extract:message:error", {
-        elapsedMs: Date.now() - start,
-        error: err instanceof Error ? err.message : String(err),
-      });
-      throw err;
-    }
-  };
-
-  const tryInject = async (): Promise<{ ok: true } | { ok: false; error: string }> => {
-    try {
-      await chrome.scripting.executeScript({
-        target: { tabId },
-        files: ["content-scripts/extract.js"],
-      });
-      opts?.log?.("extract:inject:ok");
-      return { ok: true };
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      opts?.log?.("extract:inject:error", { error: message });
-      return {
-        ok: false,
-        error:
-          message.toLowerCase().includes("cannot access") ||
-          message.toLowerCase().includes("denied")
-            ? `Chrome blocked content access (${message}). Check extension “Site access” → “On all sites” (or allow this domain), then reload the tab.`
-            : `Failed to inject content script (${message}). Check extension “Site access”, then reload the tab.`,
-      };
-    }
-  };
-
-  for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      opts?.log?.("extract:attempt", { attempt: attempt + 1, timeoutMs });
-      const res = await sendMessageWithTimeout();
-      if (!res.ok) return { ok: false, error: res.error };
-      return { ok: true, data: res };
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      const noReceiver =
-        message.includes("Receiving end does not exist") ||
-        message.includes("Could not establish connection");
-      const didTimeout = message.includes("extract timed out");
-      if (noReceiver) {
-        const injected = await tryInject();
-        if (!injected.ok) return injected;
-        await new Promise((r) => setTimeout(r, 120));
-        continue;
-      }
-
-      if (didTimeout) {
-        if (attempt === 2) {
-          return {
-            ok: false,
-            error:
-              "Page extraction timed out. Reload the tab (or “Summarize → Refresh”), then retry.",
-          };
-        }
-        const injected = await tryInject();
-        if (!injected.ok) return injected;
-        await new Promise((r) => setTimeout(r, 120));
-        continue;
-      }
-
-      if (attempt === 2) {
-        return {
-          ok: false,
-          error: noReceiver
-            ? "Content script not ready. Check extension “Site access” → “On all sites”, then reload the tab."
-            : message,
-        };
-      }
-      await new Promise((r) => setTimeout(r, 350));
-    }
-  }
-
-  return { ok: false, error: "Content script not ready" };
-}
-
-async function seekInTab(
-  tabId: number,
-  seconds: number,
-): Promise<{ ok: true } | { ok: false; error: string }> {
-  const req = { type: "seek", seconds } satisfies SeekRequest;
-
-  const tryInject = async (): Promise<{ ok: true } | { ok: false; error: string }> => {
-    try {
-      await chrome.scripting.executeScript({
-        target: { tabId },
-        files: ["content-scripts/extract.js"],
-      });
-      return { ok: true };
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      return {
-        ok: false,
-        error:
-          message.toLowerCase().includes("cannot access") ||
-          message.toLowerCase().includes("denied")
-            ? `Chrome blocked content access (${message}). Check extension “Site access” → “On all sites” (or allow this domain), then reload the tab.`
-            : `Failed to inject content script (${message}). Check extension “Site access”, then reload the tab.`,
-      };
-    }
-  };
-
-  for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      const res = (await chrome.tabs.sendMessage(tabId, req)) as SeekResponse;
-      if (!res.ok) return { ok: false, error: res.error };
-      return { ok: true };
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      const noReceiver =
-        message.includes("Receiving end does not exist") ||
-        message.includes("Could not establish connection");
-      if (noReceiver) {
-        const injected = await tryInject();
-        if (!injected.ok) return injected;
-        await new Promise((r) => setTimeout(r, 120));
-        continue;
-      }
-
-      if (attempt === 2) {
-        return {
-          ok: false,
-          error: noReceiver
-            ? "Content script not ready. Check extension “Site access” → “On all sites”, then reload the tab."
-            : message,
-        };
-      }
-      await new Promise((r) => setTimeout(r, 350));
-    }
-  }
-
-  return { ok: false, error: "Content script not ready" };
 }
 
 function resolveKeyCode(key: string): { code: string; keyCode: number; text?: string } {

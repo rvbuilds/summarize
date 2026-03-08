@@ -18,7 +18,6 @@ import { listSkills } from "../../automation/skills-store";
 import { executeToolCall, getAutomationToolNames } from "../../automation/tools";
 import { readPresetOrCustomValue } from "../../lib/combo";
 import { buildIdleSubtitle } from "../../lib/header";
-import { buildMetricsParts, buildMetricsTokens } from "../../lib/metrics";
 import {
   defaultSettings,
   loadSettings,
@@ -33,6 +32,7 @@ import { ChatController } from "./chat-controller";
 import { type ChatHistoryLimits, compactChatHistory } from "./chat-state";
 import { createErrorController } from "./error-controller";
 import { createHeaderController } from "./header-controller";
+import { createMetricsController } from "./metrics-controller";
 import { createPanelCacheController, type PanelCachePayload } from "./panel-cache";
 import {
   mountSidepanelLengthPicker,
@@ -54,6 +54,7 @@ import { hasResolvedSlidesPayload } from "./slides-pending";
 import { createStreamController } from "./stream-controller";
 import { buildSummaryEmptyState } from "./summary-empty-state";
 import type { ChatMessage, PanelPhase, PanelState, RunStart, UiState } from "./types";
+import { createTypographyController } from "./typography-controller";
 
 type PanelToBg =
   | { type: "panel:ready" }
@@ -200,6 +201,21 @@ if (!advancedSettingsBodyEl) throw new Error("Missing advanced settings body");
 const modelPresetEl = byId<HTMLSelectElement>("modelPreset");
 const modelCustomEl = byId<HTMLInputElement>("modelCustom");
 const modelRefreshBtn = byId<HTMLButtonElement>("modelRefresh");
+
+const metricsController = createMetricsController({
+  metricsEl,
+  metricsHomeEl,
+  chatMetricsSlotEl,
+});
+
+const typographyController = createTypographyController({
+  sizeSmBtn,
+  sizeLgBtn,
+  lineTightBtn,
+  lineLooseBtn,
+  defaultFontSize: defaultSettings.fontSize,
+  defaultLineHeight: defaultSettings.lineHeight,
+});
 const modelStatusEl = byId<HTMLDivElement>("modelStatus");
 const modelRowEl = byId<HTMLDivElement>("modelRow");
 const slidesLayoutEl = byId<HTMLSelectElement>("slidesLayout");
@@ -297,6 +313,7 @@ let inputMode: "page" | "video" = "page";
 let inputModeOverride: "page" | "video" | null = null;
 let mediaAvailable = false;
 let preserveChatOnNextReset = false;
+let automationNoticeSticky = false;
 let summarizeVideoLabel = "Video";
 let summarizePageWords: number | null = null;
 let summarizeVideoDurationSeconds: number | null = null;
@@ -350,7 +367,9 @@ const chatController = new ChatController({
 
 type AutomationNoticeAction = "extensions" | "options";
 
-function hideAutomationNotice() {
+function hideAutomationNotice(opts?: { force?: boolean }) {
+  if (automationNoticeSticky && !opts?.force) return;
+  automationNoticeSticky = false;
   automationNoticeEl.classList.add("hidden");
 }
 
@@ -440,7 +459,7 @@ function attachSummaryRun(run: RunStart) {
   } else {
     preserveChatOnNextReset = true;
   }
-  setActiveMetricsMode("summary");
+  metricsController.setActiveMode("summary");
   panelState.runId = run.id;
   panelState.slidesRunId = slidesParallelValue ? null : run.id;
   panelState.currentSource = { url: run.url, title: run.title };
@@ -502,12 +521,15 @@ function showAutomationNotice({
   message,
   ctaLabel,
   ctaAction,
+  sticky,
 }: {
   title: string;
   message: string;
   ctaLabel?: string;
   ctaAction?: AutomationNoticeAction;
+  sticky?: boolean;
 }) {
+  automationNoticeSticky = Boolean(sticky);
   automationNoticeTitleEl.textContent = title;
   automationNoticeMessageEl.textContent = message;
   automationNoticeActionBtn.textContent = ctaLabel || "Open extension details";
@@ -536,6 +558,7 @@ window.addEventListener("summarize:automation-permissions", (event) => {
     message: detail.message,
     ctaLabel: detail.ctaLabel,
     ctaAction: detail.ctaAction,
+    sticky: true,
   });
 });
 
@@ -1125,7 +1148,7 @@ function resetSummaryView({
   renderMarkdownHostEl.innerHTML = "";
   clearSlideStrip(renderSlidesHostEl);
   clearSlideGallery(renderSlidesHostEl);
-  clearMetricsForMode("summary");
+  metricsController.clearForMode("summary");
   panelState.summaryMarkdown = null;
   panelState.summaryFromCache = null;
   panelState.slides = null;
@@ -2273,285 +2296,7 @@ function renderInlineSlides(container: HTMLElement, opts?: { fallback?: boolean 
   }
 }
 
-function getLineHeightPx(el: HTMLElement, styles?: CSSStyleDeclaration): number {
-  const resolved = styles ?? getComputedStyle(el);
-  const lineHeightRaw = resolved.lineHeight;
-  const fontSize = Number.parseFloat(resolved.fontSize) || 0;
-  if (lineHeightRaw === "normal") return fontSize * 1.2;
-  const parsed = Number.parseFloat(lineHeightRaw);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function elementWrapsToMultipleLines(el: HTMLElement): boolean {
-  if (el.getClientRects().length === 0) return false;
-  const styles = getComputedStyle(el);
-  const lineHeight = getLineHeightPx(el, styles);
-  if (!lineHeight) return false;
-
-  const paddingTop = Number.parseFloat(styles.paddingTop) || 0;
-  const paddingBottom = Number.parseFloat(styles.paddingBottom) || 0;
-  const borderTop = Number.parseFloat(styles.borderTopWidth) || 0;
-  const borderBottom = Number.parseFloat(styles.borderBottomWidth) || 0;
-  const totalHeight = el.getBoundingClientRect().height;
-  const contentHeight = Math.max(
-    0,
-    totalHeight - paddingTop - paddingBottom - borderTop - borderBottom,
-  );
-
-  return contentHeight > lineHeight * 1.4;
-}
-
-type MetricsMode = "summary" | "chat";
-
-type MetricsState = {
-  summary: string | null;
-  inputSummary: string | null;
-  sourceUrl: string | null;
-};
-
-type MetricsRenderState = {
-  summary: string | null;
-  inputSummary: string | null;
-  sourceUrl: string | null;
-  shortened: boolean;
-  rafId: number | null;
-  observer: ResizeObserver | null;
-};
-
-const metricsRenderState: MetricsRenderState = {
-  summary: null,
-  inputSummary: null,
-  sourceUrl: null,
-  shortened: false,
-  rafId: null,
-  observer: null,
-};
-
-const metricsByMode: Record<MetricsMode, MetricsState> = {
-  summary: { summary: null, inputSummary: null, sourceUrl: null },
-  chat: { summary: null, inputSummary: null, sourceUrl: null },
-};
-
-let activeMetricsMode: MetricsMode = "summary";
-
-let metricsMeasureEl: HTMLDivElement | null = null;
-
-function ensureMetricsMeasureEl(): HTMLDivElement {
-  if (metricsMeasureEl) return metricsMeasureEl;
-  const el = document.createElement("div");
-  el.style.position = "absolute";
-  el.style.visibility = "hidden";
-  el.style.pointerEvents = "none";
-  el.style.left = "-99999px";
-  el.style.top = "0";
-  el.style.padding = "0";
-  el.style.border = "0";
-  el.style.margin = "0";
-  el.style.whiteSpace = "normal";
-  el.style.boxSizing = "content-box";
-  document.body.append(el);
-  metricsMeasureEl = el;
-  return el;
-}
-
-function syncMetricsMeasureStyles() {
-  if (!metricsMeasureEl) return;
-  const styles = getComputedStyle(metricsEl);
-  metricsMeasureEl.style.fontFamily = styles.fontFamily;
-  metricsMeasureEl.style.fontSize = styles.fontSize;
-  metricsMeasureEl.style.fontWeight = styles.fontWeight;
-  metricsMeasureEl.style.fontStyle = styles.fontStyle;
-  metricsMeasureEl.style.fontVariant = styles.fontVariant;
-  metricsMeasureEl.style.lineHeight = styles.lineHeight;
-  metricsMeasureEl.style.letterSpacing = styles.letterSpacing;
-  metricsMeasureEl.style.wordSpacing = styles.wordSpacing;
-  metricsMeasureEl.style.textTransform = styles.textTransform;
-  metricsMeasureEl.style.textIndent = styles.textIndent;
-  metricsMeasureEl.style.wordBreak = styles.wordBreak;
-  metricsMeasureEl.style.whiteSpace = styles.whiteSpace;
-  metricsMeasureEl.style.width = `${metricsEl.clientWidth}px`;
-}
-
-function ensureMetricsObserver() {
-  if (metricsRenderState.observer) return;
-  metricsRenderState.observer = new ResizeObserver(() => {
-    scheduleMetricsFitCheck();
-  });
-  metricsRenderState.observer.observe(metricsEl);
-}
-
-function scheduleMetricsFitCheck() {
-  if (!metricsRenderState.summary) return;
-  if (metricsRenderState.rafId != null) return;
-  metricsRenderState.rafId = window.requestAnimationFrame(() => {
-    metricsRenderState.rafId = null;
-    if (!metricsRenderState.summary) return;
-    const parts = buildMetricsParts({
-      summary: metricsRenderState.summary,
-      inputSummary: metricsRenderState.inputSummary,
-    });
-    if (parts.length === 0) return;
-    const fullText = parts.join(" · ");
-    if (!/\bopenrouter\//i.test(fullText)) return;
-    if (metricsEl.clientWidth <= 0) return;
-    const measureEl = ensureMetricsMeasureEl();
-    syncMetricsMeasureStyles();
-    measureEl.textContent = fullText;
-    const shouldShorten = elementWrapsToMultipleLines(measureEl);
-    if (shouldShorten === metricsRenderState.shortened) return;
-    metricsRenderState.shortened = shouldShorten;
-    renderMetricsSummary(metricsRenderState.summary, {
-      shortenOpenRouter: shouldShorten,
-      inputSummary: metricsRenderState.inputSummary,
-      sourceUrl: metricsRenderState.sourceUrl,
-    });
-  });
-}
-
-function renderMetricsSummary(
-  summary: string,
-  options?: {
-    shortenOpenRouter?: boolean;
-    inputSummary?: string | null;
-    sourceUrl?: string | null;
-  },
-) {
-  metricsEl.replaceChildren();
-  const tokens = buildMetricsTokens({
-    summary,
-    inputSummary: options?.inputSummary ?? panelState.lastMeta.inputSummary,
-    sourceUrl: options?.sourceUrl ?? panelState.currentSource?.url ?? null,
-    shortenOpenRouter: options?.shortenOpenRouter ?? false,
-  });
-
-  tokens.forEach((token, index) => {
-    if (index) metricsEl.append(document.createTextNode(" · "));
-    if (token.kind === "link") {
-      const link = document.createElement("a");
-      link.href = token.href;
-      link.textContent = token.text;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      metricsEl.append(link);
-      return;
-    }
-    if (token.kind === "media") {
-      if (token.before) metricsEl.append(document.createTextNode(token.before));
-      const link = document.createElement("a");
-      link.href = token.href;
-      link.textContent = token.label;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      metricsEl.append(link);
-      if (token.after) metricsEl.append(document.createTextNode(token.after));
-      return;
-    }
-    metricsEl.append(document.createTextNode(token.text));
-  });
-}
-
-function moveMetricsTo(mode: MetricsMode) {
-  const target = mode === "chat" ? chatMetricsSlotEl : metricsHomeEl;
-  if (metricsEl.parentElement !== target) {
-    target.append(metricsEl);
-  }
-  activeMetricsMode = mode;
-}
-
-function renderMetricsMode(mode: MetricsMode) {
-  const state = metricsByMode[mode];
-  metricsRenderState.summary = state.summary;
-  metricsRenderState.inputSummary = state.inputSummary;
-  metricsRenderState.sourceUrl = state.sourceUrl;
-  metricsRenderState.shortened = false;
-
-  if (mode === "chat") {
-    chatMetricsSlotEl.classList.toggle("isVisible", Boolean(state.summary));
-  } else {
-    chatMetricsSlotEl.classList.remove("isVisible");
-  }
-
-  metricsEl.removeAttribute("title");
-  metricsEl.removeAttribute("data-details");
-
-  if (!state.summary) {
-    metricsEl.textContent = "";
-    metricsEl.classList.add("hidden");
-    return;
-  }
-
-  renderMetricsSummary(state.summary, {
-    inputSummary: state.inputSummary,
-    sourceUrl: state.sourceUrl,
-  });
-  metricsEl.classList.remove("hidden");
-  ensureMetricsObserver();
-  scheduleMetricsFitCheck();
-}
-
-function setMetricsForMode(
-  mode: MetricsMode,
-  summary: string | null,
-  inputSummary: string | null,
-  sourceUrl: string | null,
-) {
-  metricsByMode[mode] = { summary, inputSummary, sourceUrl };
-  if (activeMetricsMode === mode) {
-    renderMetricsMode(mode);
-  }
-}
-
-function clearMetricsForMode(mode: MetricsMode) {
-  setMetricsForMode(mode, null, null, null);
-}
-
-function setActiveMetricsMode(mode: MetricsMode) {
-  moveMetricsTo(mode);
-  renderMetricsMode(mode);
-}
-
-function applyTypography(fontFamily: string, fontSize: number, lineHeight: number) {
-  document.documentElement.style.setProperty("--font-body", fontFamily);
-  document.documentElement.style.setProperty("--font-size", `${fontSize}px`);
-  document.documentElement.style.setProperty("--line-height", `${lineHeight}`);
-}
-
-const MIN_FONT_SIZE = 12;
-const MAX_FONT_SIZE = 20;
-let currentFontSize = defaultSettings.fontSize;
-const MIN_LINE_HEIGHT = 1.2;
-const MAX_LINE_HEIGHT = 1.9;
 const LINE_HEIGHT_STEP = 0.1;
-let currentLineHeight = defaultSettings.lineHeight;
-
-function clampFontSize(value: number) {
-  return Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, Math.round(value)));
-}
-
-function updateSizeControls() {
-  sizeSmBtn.disabled = currentFontSize <= MIN_FONT_SIZE;
-  sizeLgBtn.disabled = currentFontSize >= MAX_FONT_SIZE;
-}
-
-function setCurrentFontSize(value: number) {
-  currentFontSize = clampFontSize(value);
-  updateSizeControls();
-}
-
-function clampLineHeight(value: number) {
-  const rounded = Math.round(value * 10) / 10;
-  return Math.min(MAX_LINE_HEIGHT, Math.max(MIN_LINE_HEIGHT, rounded));
-}
-
-function updateLineHeightControls() {
-  lineTightBtn.disabled = currentLineHeight <= MIN_LINE_HEIGHT;
-  lineLooseBtn.disabled = currentLineHeight >= MAX_LINE_HEIGHT;
-}
-
-function setCurrentLineHeight(value: number) {
-  currentLineHeight = clampLineHeight(value);
-  updateLineHeightControls();
-}
 
 let pickerSettings = {
   scheme: defaultSettings.colorScheme,
@@ -2579,9 +2324,9 @@ const pickerHandlers = {
     void (async () => {
       const next = await patchSettings({ fontFamily: value });
       pickerSettings = { ...pickerSettings, fontFamily: next.fontFamily };
-      applyTypography(next.fontFamily, next.fontSize, next.lineHeight);
-      setCurrentFontSize(next.fontSize);
-      setCurrentLineHeight(next.lineHeight);
+      typographyController.apply(next.fontFamily, next.fontSize, next.lineHeight);
+      typographyController.setCurrentFontSize(next.fontSize);
+      typographyController.setCurrentLineHeight(next.lineHeight);
     })();
   },
   onLengthChange: (value) => {
@@ -2621,7 +2366,7 @@ function applyChatEnabled() {
     chatJumpBtn.classList.remove("isVisible");
   }
   if (!chatEnabledValue) {
-    clearMetricsForMode("chat");
+    metricsController.clearForMode("chat");
     resetChatState();
     clearQueuedMessages();
   } else {
@@ -3300,13 +3045,13 @@ const streamController = createStreamController({
     }
   },
   onMetrics: (summary) => {
-    setMetricsForMode(
+    metricsController.setForMode(
       "summary",
       summary,
       panelState.lastMeta.inputSummary,
       panelState.currentSource?.url ?? null,
     );
-    setActiveMetricsMode("summary");
+    metricsController.setActiveMode("summary");
   },
   onRender: renderMarkdown,
   onSyncWithActiveTab: syncWithActiveTab,
@@ -3757,12 +3502,16 @@ function updateControls(state: UiState) {
     }
   }
   if (
-    state.settings.fontSize !== currentFontSize ||
-    state.settings.lineHeight !== currentLineHeight
+    state.settings.fontSize !== typographyController.getCurrentFontSize() ||
+    state.settings.lineHeight !== typographyController.getCurrentLineHeight()
   ) {
-    applyTypography(pickerSettings.fontFamily, state.settings.fontSize, state.settings.lineHeight);
-    setCurrentFontSize(state.settings.fontSize);
-    setCurrentLineHeight(state.settings.lineHeight);
+    typographyController.apply(
+      pickerSettings.fontFamily,
+      state.settings.fontSize,
+      state.settings.lineHeight,
+    );
+    typographyController.setCurrentFontSize(state.settings.fontSize);
+    typographyController.setCurrentLineHeight(state.settings.lineHeight);
   }
   if (readCurrentModelValue() !== state.settings.model) {
     setModelValue(state.settings.model);
@@ -4288,7 +4037,7 @@ function startChatMessage(text: string) {
   chatController.addMessage(wrapMessage({ role: "user", content: input, timestamp: Date.now() }));
 
   panelState.chatStreaming = true;
-  setActiveMetricsMode("chat");
+  metricsController.setActiveMode("chat");
   scrollToBottom(true);
   lastAction = "chat";
 
@@ -4323,7 +4072,7 @@ function retryChat() {
   errorController.clearAll();
   abortAgentRequested = false;
   panelState.chatStreaming = true;
-  setActiveMetricsMode("chat");
+  metricsController.setActiveMode("chat");
   lastAction = "chat";
   scrollToBottom(true);
 
@@ -4399,11 +4148,13 @@ chatInputEl.addEventListener("input", () => {
 
 const bumpFontSize = (delta: number) => {
   void (async () => {
-    const nextSize = clampFontSize(currentFontSize + delta);
+    const nextSize = typographyController.clampFontSize(
+      typographyController.getCurrentFontSize() + delta,
+    );
     const next = await patchSettings({ fontSize: nextSize });
-    applyTypography(next.fontFamily, next.fontSize, next.lineHeight);
-    setCurrentFontSize(next.fontSize);
-    setCurrentLineHeight(next.lineHeight);
+    typographyController.apply(next.fontFamily, next.fontSize, next.lineHeight);
+    typographyController.setCurrentFontSize(next.fontSize);
+    typographyController.setCurrentLineHeight(next.lineHeight);
   })();
 };
 
@@ -4412,10 +4163,12 @@ sizeLgBtn.addEventListener("click", () => bumpFontSize(1));
 
 const bumpLineHeight = (delta: number) => {
   void (async () => {
-    const nextHeight = clampLineHeight(currentLineHeight + delta);
+    const nextHeight = typographyController.clampLineHeight(
+      typographyController.getCurrentLineHeight() + delta,
+    );
     const next = await patchSettings({ lineHeight: nextHeight });
-    applyTypography(next.fontFamily, next.fontSize, next.lineHeight);
-    setCurrentLineHeight(next.lineHeight);
+    typographyController.apply(next.fontFamily, next.fontSize, next.lineHeight);
+    typographyController.setCurrentLineHeight(next.lineHeight);
   })();
 };
 
@@ -4468,8 +4221,8 @@ modelRefreshBtn.addEventListener("click", () => {
 void (async () => {
   await ensurePanelPort();
   const s = await loadSettings();
-  setCurrentFontSize(s.fontSize);
-  setCurrentLineHeight(s.lineHeight);
+  typographyController.setCurrentFontSize(s.fontSize);
+  typographyController.setCurrentLineHeight(s.lineHeight);
   autoValue = s.autoSummarize;
   chatEnabledValue = s.chatEnabled;
   automationEnabledValue = s.automationEnabled;
@@ -4510,7 +4263,7 @@ void (async () => {
   setModelPlaceholderFromDiscovery({});
   updateModelRowUI();
   modelRefreshBtn.disabled = !s.token.trim();
-  applyTypography(s.fontFamily, s.fontSize, s.lineHeight);
+  typographyController.apply(s.fontFamily, s.fontSize, s.lineHeight);
   applyTheme({ scheme: s.colorScheme, mode: s.colorMode });
   toggleDrawer(false, { animate: false });
   renderMarkdownDisplay();
