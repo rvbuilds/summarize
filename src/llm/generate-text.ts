@@ -1,8 +1,18 @@
-import type { Context, Message } from "@mariozechner/pi-ai";
+import type { Context } from "@mariozechner/pi-ai";
 import { completeSimple, streamSimple } from "@mariozechner/pi-ai";
 import { createUnsupportedFunctionalityError } from "./errors.js";
+import {
+  computeRetryDelayMs,
+  isGoogleEmptySummaryError,
+  isRetryableTimeoutError,
+  promptToContext,
+  resolveEffectiveTemperature,
+  resolveGoogleEmptyResponseFallbackModelId,
+  sleep,
+  streamUsageWithTimeout,
+} from "./generate-text-shared.js";
 import { parseGatewayStyleModelId } from "./model-id.js";
-import { type Prompt, userTextAndImageMessage } from "./prompt.js";
+import type { Prompt } from "./prompt.js";
 import {
   resolveOpenAiCompatibleClientConfigForProvider,
   supportsDocumentAttachments,
@@ -53,130 +63,6 @@ type RetryNotice = {
   error: unknown;
 };
 
-function promptToContext(prompt: Prompt): Context {
-  const attachments = prompt.attachments ?? [];
-  if (attachments.some((attachment) => attachment.kind === "document")) {
-    throw new Error("Internal error: document prompt cannot be converted to context.");
-  }
-  if (attachments.length === 0) {
-    return {
-      systemPrompt: prompt.system,
-      messages: [{ role: "user", content: prompt.userText, timestamp: Date.now() }],
-    };
-  }
-  if (attachments.length !== 1 || attachments[0]?.kind !== "image") {
-    throw new Error("Internal error: only single image attachments are supported for prompts.");
-  }
-  const attachment = attachments[0];
-  const messages: Message[] = [
-    userTextAndImageMessage({
-      text: prompt.userText,
-      imageBytes: attachment.bytes,
-      mimeType: attachment.mediaType,
-    }),
-  ];
-  return { systemPrompt: prompt.system, messages };
-}
-
-function isRetryableTimeoutError(error: unknown): boolean {
-  if (!error) return false;
-  const message =
-    typeof error === "string"
-      ? error
-      : error instanceof Error
-        ? error.message
-        : typeof (error as { message?: unknown }).message === "string"
-          ? String((error as { message?: unknown }).message)
-          : "";
-  return /timed out/i.test(message) || /empty summary/i.test(message);
-}
-
-function computeRetryDelayMs(attempt: number): number {
-  const base = 500;
-  const jitter = Math.floor(Math.random() * 200);
-  return Math.min(2000, base * (attempt + 1) + jitter);
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function withTimeoutFallback<T>({
-  promise,
-  timeoutMs,
-  fallback,
-}: {
-  promise: Promise<T>;
-  timeoutMs: number;
-  fallback: T;
-}): Promise<T> {
-  const effectiveTimeoutMs =
-    Number.isFinite(timeoutMs) && timeoutMs > 0 ? Math.floor(timeoutMs) : 30_000;
-  let timer: ReturnType<typeof setTimeout> | null = null;
-  try {
-    return await Promise.race([
-      promise,
-      new Promise<T>((resolve) => {
-        timer = setTimeout(() => resolve(fallback), effectiveTimeoutMs);
-      }),
-    ]);
-  } finally {
-    if (timer) clearTimeout(timer);
-  }
-}
-
-function streamUsageWithTimeout({
-  result,
-  timeoutMs,
-}: {
-  result: Promise<{ usage?: unknown }>;
-  timeoutMs: number;
-}): Promise<LlmTokenUsage | null> {
-  const normalized = result.then((msg) => normalizeTokenUsage(msg.usage)).catch(() => null);
-  return withTimeoutFallback({
-    promise: normalized,
-    timeoutMs,
-    fallback: null,
-  });
-}
-
-function isOpenaiGpt5Model(parsed: ReturnType<typeof parseGatewayStyleModelId>): boolean {
-  return parsed.provider === "openai" && /^gpt-5([-.].+)?$/i.test(parsed.model);
-}
-
-function resolveEffectiveTemperature({
-  parsed,
-  temperature,
-}: {
-  parsed: ReturnType<typeof parseGatewayStyleModelId>;
-  temperature?: number;
-}): number | undefined {
-  if (typeof temperature !== "number") return undefined;
-  if (isOpenaiGpt5Model(parsed)) return undefined;
-  return temperature;
-}
-
-function resolveGoogleEmptyResponseFallbackModelId(modelId: string): string | null {
-  const normalized = modelId.trim().toLowerCase();
-  if (!normalized.startsWith("google/")) return null;
-  const raw = normalized.slice("google/".length);
-  if (!raw.includes("preview") && !raw.includes("exp")) return null;
-  if (raw === "gemini-2.5-flash") return null;
-  return "google/gemini-2.5-flash";
-}
-
-function isGoogleEmptySummaryError(error: unknown): boolean {
-  const message =
-    error instanceof Error
-      ? error.message
-      : typeof error === "string"
-        ? error
-        : typeof (error as { message?: unknown })?.message === "string"
-          ? String((error as { message?: unknown }).message)
-          : "";
-  return /empty summary/i.test(message);
-}
-
 export async function generateTextWithModelId({
   modelId,
   apiKeys,
@@ -218,7 +104,11 @@ export async function generateTextWithModelId({
   usage: LlmTokenUsage | null;
 }> {
   const parsed = parseGatewayStyleModelId(modelId);
-  const effectiveTemperature = resolveEffectiveTemperature({ parsed, temperature });
+  const effectiveTemperature = resolveEffectiveTemperature({
+    provider: parsed.provider,
+    model: parsed.model,
+    temperature,
+  });
 
   const attachments = prompt.attachments ?? [];
   const documentAttachment =
@@ -660,7 +550,11 @@ export async function streamTextWithContext({
       `streaming is not supported for ${parsed.provider}/... models`,
     );
   }
-  const effectiveTemperature = resolveEffectiveTemperature({ parsed, temperature });
+  const effectiveTemperature = resolveEffectiveTemperature({
+    provider: parsed.provider,
+    model: parsed.model,
+    temperature,
+  });
   void fetchImpl;
 
   const controller = new AbortController();
