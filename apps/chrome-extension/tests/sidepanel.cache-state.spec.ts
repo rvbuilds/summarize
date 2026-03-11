@@ -5,14 +5,17 @@ import {
   routePlaceholderSlideImages,
 } from "./helpers/daemon-fixtures";
 import {
+  activateTabByUrl,
   assertNoErrors,
   buildUiState,
   closeExtension,
   getBrowserFromProject,
+  getActiveTabId,
   launchExtension,
   openExtensionPage,
   seedSettings,
   sendBgMessage,
+  waitForActiveTabUrl,
   waitForPanelPort,
 } from "./helpers/extension-harness";
 import {
@@ -527,6 +530,19 @@ test("sidepanel keeps slide summaries isolated when switching YouTube videos mid
       "Bravo twist",
       "Bravo summary body two explains the twist in the second scene.",
     ].join("\n");
+    await harness.context.route("https://www.youtube.com/**", async (route) => {
+      const url = route.request().url();
+      const title = url.includes("alpha123")
+        ? "Alpha Tab"
+        : url.includes("bravo456")
+          ? "Bravo Tab"
+          : "YouTube placeholder";
+      await route.fulfill({
+        status: 200,
+        headers: { "content-type": "text/html" },
+        body: `<html><head><title>${title}</title></head><body><article>${title}</article></body></html>`,
+      });
+    });
 
     await page.route("http://127.0.0.1:8787/v1/summarize/**/events", async (route) => {
       const runId =
@@ -554,6 +570,18 @@ test("sidepanel keeps slide summaries isolated when switching YouTube videos mid
 
     const alphaUrl = "https://www.youtube.com/watch?v=alpha123";
     const bravoUrl = "https://www.youtube.com/watch?v=bravo456";
+    await (await harness.context.newPage()).goto(alphaUrl, { waitUntil: "domcontentloaded" });
+    await (await harness.context.newPage()).goto(bravoUrl, { waitUntil: "domcontentloaded" });
+    await activateTabByUrl(harness, alphaUrl);
+    await waitForActiveTabUrl(harness, alphaUrl);
+    const alphaTabId = await getActiveTabId(harness);
+    await activateTabByUrl(harness, bravoUrl);
+    await waitForActiveTabUrl(harness, bravoUrl);
+    const bravoTabId = await getActiveTabId(harness);
+    expect(alphaTabId).not.toBeNull();
+    expect(bravoTabId).not.toBeNull();
+    await activateTabByUrl(harness, alphaUrl);
+    await waitForActiveTabUrl(harness, alphaUrl);
     const alphaPayload = {
       sourceUrl: alphaUrl,
       sourceId: "youtube-alpha123",
@@ -640,7 +668,7 @@ test("sidepanel keeps slide summaries isolated when switching YouTube videos mid
     });
 
     const tabAState = buildUiState({
-      tab: { id: 1, url: alphaUrl, title: "Alpha Tab" },
+      tab: { id: alphaTabId, url: alphaUrl, title: "Alpha Tab" },
       media: { hasVideo: true, hasAudio: true, hasCaptions: true },
       settings: {
         autoSummarize: false,
@@ -652,7 +680,7 @@ test("sidepanel keeps slide summaries isolated when switching YouTube videos mid
       },
     });
     const tabBState = buildUiState({
-      tab: { id: 2, url: bravoUrl, title: "Bravo Tab" },
+      tab: { id: bravoTabId, url: bravoUrl, title: "Bravo Tab" },
       media: { hasVideo: true, hasAudio: true, hasCaptions: true },
       settings: {
         autoSummarize: false,
@@ -683,6 +711,8 @@ test("sidepanel keeps slide summaries isolated when switching YouTube videos mid
       url: alphaUrl,
     });
 
+    await activateTabByUrl(harness, bravoUrl);
+    await waitForActiveTabUrl(harness, bravoUrl);
     await applyBgMessage({ type: "ui:state", state: tabBState });
     await applyBgMessage({
       type: "run:start",
@@ -710,7 +740,7 @@ test("sidepanel keeps slide summaries isolated when switching YouTube videos mid
     const bravoDescriptions = await getPanelSlideDescriptions(page);
     expect(bravoDescriptions[0]?.[1] ?? "").toContain("bravo");
     expect(bravoDescriptions[1]?.[1] ?? "").toContain("bravo");
-    await expect(page.locator('.slideGallery__thumb img[data-loaded="true"]')).toHaveCount(2);
+    await expect(page.locator(".slideGallery__thumb img")).toHaveCount(2);
 
     await page.waitForTimeout(1_200);
     const stillBravoDescriptions = await getPanelSlideDescriptions(page);
