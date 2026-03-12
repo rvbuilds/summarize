@@ -255,6 +255,8 @@ test("sidepanel refresh free shows error on failure", async ({
     });
 
     const page = await openExtensionPage(harness, "sidepanel.html", "#title");
+    await waitForPanelPort(page);
+    await waitForSettingsHydratedHook(page);
     await page.click("#drawerToggle");
     await expect(page.locator("#drawer")).toBeVisible();
     await sendBgMessage(harness, {
@@ -283,6 +285,8 @@ test("sidepanel mode picker applies overlay selection", async ({
 
   try {
     const page = await openExtensionPage(harness, "sidepanel.html", "#title");
+    await waitForPanelPort(page);
+    await waitForSettingsHydratedHook(page);
     await page.click("#drawerToggle");
     await expect(page.locator("#drawer")).toBeVisible();
 
@@ -310,6 +314,8 @@ test("sidepanel custom length input accepts typing", async ({
 
   try {
     const page = await openExtensionPage(harness, "sidepanel.html", "#title");
+    await waitForPanelPort(page);
+    await waitForSettingsHydratedHook(page);
     await page.click("#drawerToggle");
     await expect(page.locator("#drawer")).toBeVisible();
 

@@ -426,6 +426,7 @@ test("sidepanel starts pending slides after returning to a tab with seeded place
     });
 
     await sendBgMessage(harness, { type: "ui:state", state: tabAState });
+    await expect(page.locator("#title")).toHaveText("Alpha Video");
     await sendBgMessage(harness, {
       type: "run:start",
       run: {
@@ -441,6 +442,7 @@ test("sidepanel starts pending slides after returning to a tab with seeded place
       .toBeGreaterThan(1);
 
     await sendBgMessage(harness, { type: "ui:state", state: tabBState });
+    await expect(page.locator("#title")).toHaveText("Bravo Tab");
     const waitForSlidesEvents = page.waitForResponse(
       (response) =>
         response.url().includes("/v1/summarize/slides-a/slides/events") &&

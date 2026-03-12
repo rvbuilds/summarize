@@ -270,6 +270,7 @@ test("sidepanel clears cached slides when switching from a cached YouTube video 
     });
 
     await sendBgMessage(harness, { type: "ui:state", state: tabAState });
+    await expect(page.locator("#title")).toHaveText("Alpha Tab");
     await sendBgMessage(harness, {
       type: "run:start",
       run: {
@@ -431,6 +432,7 @@ test("sidepanel keeps cached slides isolated while a different YouTube video res
     await expect(page.locator("#render")).toContainText("Summary A");
 
     await sendBgMessage(harness, { type: "ui:state", state: tabBState });
+    await expect(page.locator("#title")).toHaveText("Bravo Tab");
     await sendBgMessage(harness, {
       type: "run:start",
       run: {

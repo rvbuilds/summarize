@@ -16,6 +16,7 @@ import {
   waitForPanelPort,
 } from "./helpers/extension-harness";
 import { allowFirefoxExtensionTests } from "./helpers/extension-test-config";
+import { waitForSettingsHydratedHook } from "./helpers/panel-hooks";
 
 test.skip(
   ({ browserName }) => browserName === "firefox" && !allowFirefoxExtensionTests,
@@ -52,6 +53,7 @@ test("sidepanel shows an error when agent request fails", async ({
 
     const page = await openExtensionPage(harness, "sidepanel.html", "#title");
     await waitForPanelPort(page);
+    await waitForSettingsHydratedHook(page);
     await maybeBringToFront(contentPage);
     await activateTabByUrl(harness, "https://example.com");
     await waitForActiveTabUrl(harness, "https://example.com");
@@ -163,6 +165,7 @@ test("sidepanel shows daemon upgrade hint when /v1/agent is missing", async ({
 
     const page = await openExtensionPage(harness, "sidepanel.html", "#title");
     await waitForPanelPort(page);
+    await waitForSettingsHydratedHook(page);
     await maybeBringToFront(contentPage);
     await activateTabByUrl(harness, "https://example.com");
     await waitForActiveTabUrl(harness, "https://example.com");

@@ -520,6 +520,23 @@ export async function openExtensionPage(
     waitUntil: "domcontentloaded",
   });
   await page.waitForSelector(readySelector);
+  if (pathname === "sidepanel.html") {
+    await page.waitForFunction(
+      () => {
+        const global = window as typeof globalThis & {
+          __summarizePanelPort?: { postMessage?: unknown };
+          __summarizeTestHooks?: { getSettingsHydrated?: () => boolean };
+        };
+        return (
+          typeof global.__summarizePanelPort?.postMessage === "function" &&
+          typeof global.__summarizeTestHooks?.getSettingsHydrated === "function" &&
+          global.__summarizeTestHooks.getSettingsHydrated() === true
+        );
+      },
+      null,
+      { timeout: 10_000 },
+    );
+  }
   return page;
 }
 
