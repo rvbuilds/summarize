@@ -19,9 +19,9 @@
   "dependencies": {
     "@mozilla/readability": "0.6.0",
     "@steipete/summarize-core": "workspace:*",
-    "@zag-js/checkbox": "^1.35.3",
-    "@zag-js/preact": "^1.35.3",
-    "@zag-js/select": "^1.35.3",
+    "@zag-js/checkbox": "^1.36.0",
+    "@zag-js/preact": "^1.36.0",
+    "@zag-js/select": "^1.36.0",
     "markdown-it": "^14.1.1",
     "preact": "10.29.0"
   },
