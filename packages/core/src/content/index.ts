@@ -39,6 +39,7 @@ export {
   inferDirectMediaKind,
   isDirectMediaExtension,
   isDirectMediaUrl,
+  isDirectVideoInput,
   isPodcastHost,
   isTwitterBroadcastUrl,
   isTwitterStatusUrl,

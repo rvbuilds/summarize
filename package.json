@@ -39,6 +39,7 @@
     "build:lib": "tsc -p tsconfig.build.json",
     "check": "pnpm format:check && pnpm lint && pnpm test:coverage",
     "clean": "rimraf dist packages/core/dist",
+    "dev:cli": "pnpm -C packages/core build && tsx src/cli.ts",
     "docs:list": "tsx scripts/docs-list.ts",
     "format": "oxfmt --write",
     "format:check": "oxfmt --check",

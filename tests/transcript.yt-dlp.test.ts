@@ -18,10 +18,14 @@ const falMock = vi.hoisted(() => ({
 }));
 
 vi.mock("node:child_process", () => ({ spawn: spawnMock }));
-vi.mock("node:fs", () => ({
-  promises: fsMock,
-  openAsBlob: fsMock.openAsBlob,
-}));
+vi.mock("node:fs", async () => {
+  const actual = await vi.importActual<typeof import("node:fs")>("node:fs");
+  return {
+    ...actual,
+    promises: fsMock,
+    openAsBlob: fsMock.openAsBlob,
+  };
+});
 vi.mock("@fal-ai/client", () => falMock);
 
 import { fetchTranscriptWithYtDlp } from "../packages/core/src/content/transcript/providers/youtube/yt-dlp.js";

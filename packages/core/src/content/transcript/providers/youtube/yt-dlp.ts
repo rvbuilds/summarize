@@ -1,8 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
-import { basename, extname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { basename, join } from "node:path";
 import { spawnTracked } from "../../../../processes.js";
 import {
   probeMediaDurationSecondsWithFfprobe,
@@ -13,6 +12,7 @@ import { buildMissingTranscriptionProviderMessage } from "../../../../transcript
 import type { MediaCache } from "../../../cache/types.js";
 import type { LinkPreviewProgressEvent } from "../../../link-preview/deps.js";
 import { ProgressKind } from "../../../link-preview/deps.js";
+import { resolveLocalDirectMediaSource } from "../../../local-file.js";
 import {
   resolveTranscriptionConfig,
   type TranscriptionConfig,
@@ -52,62 +52,6 @@ type YtDlpDurationRequest = {
   ytDlpPath: string | null;
   url: string;
 };
-
-function resolveLocalFileInput(
-  url: string,
-  mediaKind: "video" | "audio" | null,
-): { filePath: string; mediaType: string; filename: string } | null {
-  try {
-    const parsed = new URL(url);
-    if (parsed.protocol !== "file:") return null;
-    parsed.search = "";
-    parsed.hash = "";
-    const filePath = fileURLToPath(parsed);
-    const filename = basename(filePath);
-    const ext = extname(filename).replace(/^\./, "").toLowerCase();
-    const mediaType =
-      ext === "mp4" || ext === "m4v"
-        ? "video/mp4"
-        : ext === "mov"
-          ? "video/quicktime"
-          : ext === "mkv"
-            ? "video/x-matroska"
-            : ext === "webm"
-              ? mediaKind === "audio"
-                ? "audio/webm"
-                : "video/webm"
-              : ext === "mpeg" || ext === "mpg"
-                ? "video/mpeg"
-                : ext === "avi"
-                  ? "video/x-msvideo"
-                  : ext === "wmv"
-                    ? "video/x-ms-wmv"
-                    : ext === "flv"
-                      ? "video/x-flv"
-                      : ext === "mp3"
-                        ? "audio/mpeg"
-                        : ext === "m4a"
-                          ? "audio/mp4"
-                          : ext === "wav"
-                            ? "audio/wav"
-                            : ext === "flac"
-                              ? "audio/flac"
-                              : ext === "aac"
-                                ? "audio/aac"
-                                : ext === "ogg" || ext === "opus"
-                                  ? "audio/ogg"
-                                  : ext === "aiff"
-                                    ? "audio/aiff"
-                                    : ext === "wma"
-                                      ? "audio/x-ms-wma"
-                                      : mediaKind === "video"
-                                        ? "video/mp4"
-                                        : "audio/mpeg";
-    return { filePath, mediaType, filename };
-  } catch {
-    return null;
-  }
-}
 
 export const fetchTranscriptWithYtDlp = async ({
   ytDlpPath,
@@ -161,13 +105,17 @@ export const fetchTranscriptWithYtDlp = async ({
   const progress = typeof onProgress === "function" ? onProgress : null;
   const providerHint = startInfo.providerHint;
   const modelId = startInfo.modelId;
-  const localFileInput = resolveLocalFileInput(url, mediaKind);
+  const localFileInput = resolveLocalDirectMediaSource(url, mediaKind);
   const cachedMedia = localFileInput ? null : mediaCache ? await mediaCache.get({ url }) : null;
 
   const outputFile = join(tmpdir(), `summarize-${randomUUID()}.mp3`);
   let filePath = localFileInput?.filePath ?? cachedMedia?.filePath ?? outputFile;
   let mediaType = localFileInput?.mediaType ?? "audio/mpeg";
-  let filename = localFileInput?.filename ?? "audio.mp3";
+  let filename =
+    localFileInput?.filename ??
+    cachedMedia?.filename ??
+    (cachedMedia?.filePath ? basename(cachedMedia.filePath) : null) ??
+    "audio.mp3";
   let shouldCleanup = !localFileInput?.filePath && !cachedMedia?.filePath;
   try {
     if (localFileInput) {

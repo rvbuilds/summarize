@@ -1,7 +1,7 @@
 import type { SummarizeConfig } from "../config.js";
 import type { InputTarget } from "../content/asset.js";
-import { isDirectMediaUrl } from "../content/index.js";
-import { isDirectVideoInput, resolveSlideSettings, type SlideSettings } from "../slides/index.js";
+import { isDirectMediaUrl, isDirectVideoInput } from "../content/index.js";
+import { resolveSlideSettings, type SlideSettings } from "../slides/index.js";
 
 export function resolveRunnerSlidesSettings(options: {
   normalizedArgv: string[];

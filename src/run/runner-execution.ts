@@ -1,8 +1,8 @@
 import { pathToFileURL } from "node:url";
 import type { InputTarget } from "../content/asset.js";
+import { isDirectVideoInput } from "../content/index.js";
 import type { RunMetricsReport } from "../costs.js";
 import type { ExecFileFn } from "../markitdown.js";
-import { isDirectVideoInput } from "../slides/index.js";
 import type { AssetAttachment } from "./attachments.js";
 import { extractAssetContent } from "./flows/asset/extract.js";
 import type { AssetExtractContext } from "./flows/asset/extract.js";

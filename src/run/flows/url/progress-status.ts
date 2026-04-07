@@ -1,4 +1,10 @@
 import type { OscProgressController } from "../../../tty/osc-progress.js";
+import {
+  applySlidesText,
+  applySummaryText,
+  clearSlidesText,
+  createUrlProgressStatusState,
+} from "./progress-status-state.js";
 
 export function createUrlProgressStatus({
   enabled,
@@ -11,10 +17,7 @@ export function createUrlProgressStatus({
   oscProgress: OscProgressController;
   now?: () => number;
 }) {
-  let summaryText: string | null = null;
-  let slidesActive = false;
-  let slidesText: string | null = null;
-  let lastSlideRenderAt = 0;
+  const state = createUrlProgressStatusState();
 
   const render = (text: string | null) => {
     if (!enabled || !text) return;
@@ -27,23 +30,14 @@ export function createUrlProgressStatus({
 
   return {
     setSummary(text: string, oscLabel?: string | null) {
-      summaryText = text;
-      if (slidesActive) return;
-      render(text);
+      render(applySummaryText(state, text).renderText);
       if (oscLabel) {
         oscProgress.setIndeterminate(oscLabel);
         refresh();
       }
     },
     setSlides(text: string, percent?: number | null) {
-      slidesActive = true;
-      const previousSlidesText = slidesText;
-      slidesText = text;
-      const nowMs = now();
-      if (previousSlidesText == null || nowMs - lastSlideRenderAt >= 100) {
-        lastSlideRenderAt = nowMs;
-        render(text);
-      }
+      render(applySlidesText(state, text, now()).renderText);
       if (typeof percent === "number" && Number.isFinite(percent)) {
         oscProgress.setPercent("Slides", Math.max(0, Math.min(100, percent)));
       } else {
@@ -52,22 +46,21 @@ export function createUrlProgressStatus({
       refresh();
     },
     clearSlides() {
-      slidesActive = false;
-      slidesText = null;
-      if (summaryText) {
-        render(summaryText);
+      const next = clearSlidesText(state);
+      if (next.summaryText) {
+        render(next.renderText);
         oscProgress.setIndeterminate("Summarizing");
         refresh();
       }
     },
     isSlidesActive() {
-      return slidesActive;
+      return state.slidesActive;
     },
     getSummaryText() {
-      return summaryText;
+      return state.summaryText;
     },
     getSlidesText() {
-      return slidesText;
+      return state.slidesText;
     },
   };
 }

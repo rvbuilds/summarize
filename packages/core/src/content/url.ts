@@ -1,3 +1,10 @@
+import {
+  DIRECT_MEDIA_EXTENSIONS,
+  inferDirectMediaKind,
+  isDirectMediaExtension,
+  isDirectMediaUrl,
+  isDirectVideoInput,
+} from "./direct-media.js";
 import { isPodcastHost } from "./link-preview/content/podcast-utils.js";
 import { isTwitterBroadcastUrl, isTwitterStatusUrl } from "./link-preview/content/twitter-utils.js";
 
@@ -14,63 +21,6 @@ export const isYouTubeUrl = (rawUrl: string): boolean => {
 };
 
 const YOUTUBE_VIDEO_ID_PATTERN = /^[a-zA-Z0-9_-]{11}$/;
-export const DIRECT_MEDIA_EXTENSIONS = [
-  "mp4",
-  "mov",
-  "m4v",
-  "mkv",
-  "webm",
-  "mpeg",
-  "mpg",
-  "avi",
-  "wmv",
-  "flv",
-  "mp3",
-  "m4a",
-  "wav",
-  "flac",
-  "aac",
-  "ogg",
-  "opus",
-  "aiff",
-  "wma",
-] as const;
-const DIRECT_VIDEO_EXTENSION_SET = new Set<string>([
-  "mp4",
-  "mov",
-  "m4v",
-  "mkv",
-  "webm",
-  "mpeg",
-  "mpg",
-  "avi",
-  "wmv",
-  "flv",
-]);
-const DIRECT_AUDIO_EXTENSION_SET = new Set<string>([
-  "mp3",
-  "m4a",
-  "wav",
-  "flac",
-  "aac",
-  "ogg",
-  "opus",
-  "aiff",
-  "wma",
-]);
-const DIRECT_MEDIA_EXTENSION_SET = new Set<string>(DIRECT_MEDIA_EXTENSIONS);
-const DIRECT_MEDIA_URL_PATTERN = new RegExp(
-  `\\.(${DIRECT_MEDIA_EXTENSIONS.join("|")})(\\?|#|$)`,
-  "i",
-);
-
-function normalizePathForExtension(value: string): string {
-  try {
-    return new URL(value).pathname;
-  } catch {
-    return value.split(/[?#]/, 1)[0] ?? value;
-  }
-}
 
 export function isYouTubeVideoUrl(rawUrl: string): boolean {
   try {
@@ -131,26 +81,6 @@ export function extractYouTubeVideoId(rawUrl: string): string | null {
   return null;
 }
 
-export function isDirectMediaUrl(url: string): boolean {
-  return DIRECT_MEDIA_URL_PATTERN.test(url);
-}
-
-export function isDirectMediaExtension(ext: string): boolean {
-  const normalized = ext.trim().replace(/^\./, "").toLowerCase();
-  return DIRECT_MEDIA_EXTENSION_SET.has(normalized);
-}
-
-export function inferDirectMediaKind(value: string): "video" | "audio" | null {
-  const match = normalizePathForExtension(value)
-    .toLowerCase()
-    .match(/\.([a-z0-9]+)$/i);
-  const ext = match?.[1] ?? null;
-  if (!ext) return null;
-  if (DIRECT_VIDEO_EXTENSION_SET.has(ext)) return "video";
-  if (DIRECT_AUDIO_EXTENSION_SET.has(ext)) return "audio";
-  return null;
-}
-
 export function shouldPreferUrlMode(url: string): boolean {
   return (
     isYouTubeVideoUrl(url) ||
@@ -162,3 +92,10 @@ export function shouldPreferUrlMode(url: string): boolean {
 }
 
 export { isTwitterBroadcastUrl, isTwitterStatusUrl, isPodcastHost };
+export {
+  DIRECT_MEDIA_EXTENSIONS,
+  inferDirectMediaKind,
+  isDirectMediaExtension,
+  isDirectMediaUrl,
+  isDirectVideoInput,
+};

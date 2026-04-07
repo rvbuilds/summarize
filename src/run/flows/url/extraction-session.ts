@@ -1,47 +1,24 @@
-import { statSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import { NEGATIVE_TTL_MS } from "@steipete/summarize-core/content";
 import * as urlUtils from "@steipete/summarize-core/content/url";
 import { buildExtractCacheKey } from "../../../cache.js";
 import {
   createLinkPreviewClient,
   type ExtractedLinkContent,
-  type FetchLinkContentOptions,
   type LinkPreviewProgressEvent,
 } from "../../../content/index.js";
 import { createFirecrawlScraper } from "../../../firecrawl.js";
-import { isDirectVideoInput, resolveSlideSource } from "../../../slides/index.js";
+import { resolveSlideSource } from "../../../slides/index.js";
 import { readTweetWithPreferredClient } from "../../bird.js";
 import { resolveTwitterCookies } from "../../cookies/twitter.js";
 import { hasBirdCli, hasXurlCli } from "../../env.js";
 import { writeVerbose } from "../../logging.js";
 import { fetchLinkContentWithBirdTip } from "./extract.js";
+import { resolveUrlFetchOptions } from "./fetch-options.js";
 import type { UrlFlowContext } from "./types.js";
 
 type LinkPreviewClientOptions = NonNullable<Parameters<typeof createLinkPreviewClient>[0]>;
 type ConvertHtmlToMarkdown = LinkPreviewClientOptions["convertHtmlToMarkdown"];
 type LinkPreviewProgressHandler = ((event: LinkPreviewProgressEvent) => void) | null;
-
-function isLocalFileUrl(url: string): boolean {
-  try {
-    return new URL(url).protocol === "file:";
-  } catch {
-    return false;
-  }
-}
-
-function resolveLocalFileMtime(url: string): number | null {
-  try {
-    const parsed = new URL(url);
-    if (parsed.protocol !== "file:") return null;
-    parsed.search = "";
-    parsed.hash = "";
-    const stat = statSync(fileURLToPath(parsed));
-    return stat.mtimeMs ?? null;
-  } catch {
-    return null;
-  }
-}
 
 export type UrlExtractionSession = {
   cacheStore: UrlFlowContext["cache"]["store"] | null;
@@ -112,37 +89,16 @@ export function createUrlExtractionSession({
     onProgress,
   });
 
-  const buildFetchOptions = (
-    targetUrl: string,
-    fileMtime: number | null,
-  ): FetchLinkContentOptions => ({
-    timeoutMs: flags.timeoutMs,
-    maxCharacters:
-      typeof flags.maxExtractCharacters === "number" && flags.maxExtractCharacters > 0
-        ? flags.maxExtractCharacters
-        : undefined,
-    youtubeTranscript: flags.youtubeMode,
-    mediaTranscript:
-      flags.videoMode === "transcript" || (Boolean(flags.slides) && isDirectVideoInput(targetUrl))
-        ? "prefer"
-        : "auto",
-    transcriptTimestamps: flags.transcriptTimestamps,
-    firecrawl: flags.firecrawlMode,
-    format: markdown.markdownRequested ? "markdown" : "text",
-    markdownMode: markdown.markdownRequested ? markdown.effectiveMarkdownMode : undefined,
-    cacheMode: cacheState.mode,
-    fileMtime,
-  });
-
   const fetchWithCache = async (
     targetUrl: string,
     { bypassExtractCache = false }: { bypassExtractCache?: boolean } = {},
   ): Promise<ExtractedLinkContent> => {
-    const localFile = isLocalFileUrl(targetUrl);
-    const options = buildFetchOptions(
+    const { localFile, options } = resolveUrlFetchOptions({
       targetUrl,
-      localFile ? resolveLocalFileMtime(targetUrl) : null,
-    );
+      flags,
+      markdown,
+      cacheMode: cacheState.mode,
+    });
     const cacheKey =
       !localFile && cacheStore && cacheState.mode === "default"
         ? buildExtractCacheKey({

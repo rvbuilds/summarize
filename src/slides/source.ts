@@ -1,83 +1,19 @@
-import { statSync } from "node:fs";
-import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { resolveLocalDirectMediaSource } from "@steipete/summarize-core/content/local-file";
 import type { ExtractedLinkContent } from "../content/index.js";
-import { extractYouTubeVideoId, isYouTubeUrl } from "../content/index.js";
+import { extractYouTubeVideoId, isDirectVideoInput, isYouTubeUrl } from "../content/index.js";
 import { buildDirectSourceId, buildYoutubeSourceId } from "./source-id.js";
 import type { SlideSource } from "./types.js";
 
-const DIRECT_VIDEO_EXTENSIONS = new Set([
-  "mp4",
-  "mov",
-  "m4v",
-  "mkv",
-  "webm",
-  "mpeg",
-  "mpg",
-  "avi",
-  "wmv",
-  "flv",
-]);
-
-function normalizePathForExtension(value: string): string {
-  try {
-    return new URL(value).pathname;
-  } catch {
-    return value.split(/[?#]/, 1)[0];
-  }
-}
-
-export function isDirectVideoInput(value: string): boolean {
-  const ext = path
-    .extname(normalizePathForExtension(value))
-    .trim()
-    .replace(/^\./, "")
-    .toLowerCase();
-  return DIRECT_VIDEO_EXTENSIONS.has(ext);
-}
+export { isDirectVideoInput } from "../content/index.js";
 
 function resolveLocalDirectVideoSource(raw: string): SlideSource | null {
-  const trimmed = raw.trim();
-  if (!trimmed) return null;
-
-  try {
-    if (trimmed.startsWith("file://")) {
-      const parsed = new URL(trimmed);
-      parsed.search = "";
-      parsed.hash = "";
-      const filePath = fileURLToPath(parsed);
-      const stat = statSync(filePath);
-      if (!stat.isFile()) return null;
-      const normalizedUrl = parsed.href;
-      if (!isDirectVideoInput(normalizedUrl) && !isDirectVideoInput(filePath)) return null;
-      return {
-        url: normalizedUrl,
-        kind: "direct",
-        sourceId: buildDirectSourceId(
-          `${normalizedUrl}#mtime=${Math.round(stat.mtimeMs).toString()}`,
-        ),
-      };
-    }
-  } catch {
-    return null;
-  }
-
-  try {
-    const filePath = path.resolve(trimmed);
-    const stat = statSync(filePath);
-    if (!stat.isFile()) return null;
-    if (!isDirectVideoInput(filePath)) return null;
-    const normalizedUrl = pathToFileURL(filePath).href;
-    return {
-      url: normalizedUrl,
-      kind: "direct",
-      sourceId: buildDirectSourceId(
-        `${normalizedUrl}#mtime=${Math.round(stat.mtimeMs).toString()}`,
-      ),
-    };
-  } catch {
-    return null;
-  }
+  const local = resolveLocalDirectMediaSource(raw, "video");
+  if (!local) return null;
+  return {
+    url: local.fileUrl,
+    kind: "direct",
+    sourceId: buildDirectSourceId(`${local.fileUrl}#mtime=${Math.round(local.mtimeMs).toString()}`),
+  };
 }
 
 export function resolveSlideSource({

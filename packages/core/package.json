@@ -23,6 +23,10 @@
       "types": "./dist/types/content/url.d.ts",
       "import": "./dist/esm/content/url.js"
     },
+    "./content/local-file": {
+      "types": "./dist/types/content/local-file.d.ts",
+      "import": "./dist/esm/content/local-file.js"
+    },
     "./prompts": {
       "types": "./dist/types/prompts/index.d.ts",
       "import": "./dist/esm/prompts/index.js"
