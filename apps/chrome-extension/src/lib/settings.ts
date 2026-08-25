@@ -1,4 +1,4 @@
-import type { SummarizeRequestOverrides } from "@steipete/summarize-core/runtime";
+import type { SummarizeRequestOverrides } from "@rvbuilds/summarize-core/runtime";
 import { enforceDaemonPolicy, readDaemonPolicy } from "./daemon-policy";
 import { readStoredSettings, writeStoredSettings } from "./settings-storage";
 import {

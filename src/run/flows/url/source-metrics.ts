@@ -1,4 +1,4 @@
-import type { SourceMetrics } from "@steipete/summarize-core/content";
+import type { SourceMetrics } from "@rvbuilds/summarize-core/content";
 
 export function formatSourceMetricsHeader(
   metrics: SourceMetrics | null | undefined,

@@ -1,4 +1,4 @@
-import { parseSseStream } from "@steipete/summarize-core/runtime";
+import { parseSseStream } from "@rvbuilds/summarize-core/runtime";
 import { buildBrowserSummaryPayload } from "../../lib/browser-summary";
 import { fetchBrowserUrlContent } from "../../lib/browser-url-content";
 import { daemonFetch } from "../../lib/daemon-fetch";

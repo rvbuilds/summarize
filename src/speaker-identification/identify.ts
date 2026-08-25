@@ -1,5 +1,5 @@
-import type { ExtractedLinkContent, TranscriptSegment } from "@steipete/summarize-core/content";
-import { applyContentBudget, formatTimestampMs } from "@steipete/summarize-core/content";
+import type { ExtractedLinkContent, TranscriptSegment } from "@rvbuilds/summarize-core/content";
+import { applyContentBudget, formatTimestampMs } from "@rvbuilds/summarize-core/content";
 import { hashJson } from "../cache-keys.js";
 import type { LlmTokenUsage } from "../llm/types.js";
 import {

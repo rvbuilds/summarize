@@ -19,7 +19,7 @@ summary: "Install the summarize CLI and optional media dependencies."
 ### npm (cross-platform)
 
 ```bash
-npm i -g @steipete/summarize
+npm i -g @rvbuilds/summarize
 ```
 
 ### Homebrew (macOS, Linux)
@@ -33,7 +33,7 @@ The Homebrew formula lives in `homebrew/core`. If Homebrew isn't available, use 
 ### npx (no install)
 
 ```bash
-npx -y @steipete/summarize "https://example.com"
+npx -y @rvbuilds/summarize "https://example.com"
 ```
 
 Useful for one-shot summaries on a fresh machine.
@@ -43,11 +43,11 @@ Useful for one-shot summaries on a fresh machine.
 If you want extraction without the CLI, install the trimmed library:
 
 ```bash
-npm i @steipete/summarize-core
+npm i @rvbuilds/summarize-core
 ```
 
 ```ts
-import { createLinkPreviewClient } from "@steipete/summarize-core/content";
+import { createLinkPreviewClient } from "@rvbuilds/summarize-core/content";
 ```
 
 ## Optional dependencies

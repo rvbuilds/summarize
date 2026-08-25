@@ -102,7 +102,7 @@ describe("buildLinkSummaryPrompt", () => {
       shares: [
         {
           author: "Peter",
-          handle: "steipete",
+          handle: "rvbuilds",
           text: "Worth reading",
           likeCount: 1200,
           reshareCount: 45,
@@ -117,7 +117,7 @@ describe("buildLinkSummaryPrompt", () => {
     expect(prompt).toContain("Note: Content truncated");
     expect(prompt).toContain("Tweets from sharers:");
     expect(prompt).toContain(
-      "- @steipete (2025-12-17) [1,200 likes, 45 reshares, 2 replies]: Worth reading",
+      "- @rvbuilds (2025-12-17) [1,200 likes, 45 reshares, 2 replies]: Worth reading",
     );
     expect(prompt).toContain('append a brief subsection titled "What sharers are saying"');
     expect(prompt).toContain("Use 2-5 short paragraphs.");

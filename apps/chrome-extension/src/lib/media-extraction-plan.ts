@@ -1,4 +1,4 @@
-import { isYouTubeVideoUrl, shouldPreferUrlMode } from "@steipete/summarize-core/content/url";
+import { isYouTubeVideoUrl, shouldPreferUrlMode } from "@rvbuilds/summarize-core/content/url";
 
 export type MediaInputMode = "page" | "video";
 

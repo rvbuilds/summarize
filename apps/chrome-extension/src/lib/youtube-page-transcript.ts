@@ -4,7 +4,7 @@ import {
   parseTimestampStringToMs,
   rankYoutubeCaptionTracks,
   resolveYoutubeCaptionTrack,
-} from "@steipete/summarize-core/content/youtube-captions";
+} from "@rvbuilds/summarize-core/content/youtube-captions";
 
 export type BrowserYouTubeTranscript =
   | {

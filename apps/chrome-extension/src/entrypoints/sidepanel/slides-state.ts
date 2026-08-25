@@ -1,4 +1,4 @@
-import { SUMMARY_LENGTH_SPECS } from "@steipete/summarize-core/prompts";
+import { SUMMARY_LENGTH_SPECS } from "@rvbuilds/summarize-core/prompts";
 import type { SummaryLength, SseSlidesData } from "../../lib/runtime-contracts";
 import { buildSlidePresentation, type SlidePresentationCard } from "../../lib/slides-presentation";
 import {

@@ -1,4 +1,4 @@
-import { shouldPreferUrlMode } from "@steipete/summarize-core/content/url";
+import { shouldPreferUrlMode } from "@rvbuilds/summarize-core/content/url";
 import { pageReadabilityExtractor } from "./page-readability";
 import { redditThreadExtractor } from "./reddit-thread";
 import type { Extractor, ExtractorContext, ExtractorResult } from "./types";

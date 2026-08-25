@@ -1,4 +1,4 @@
-import { extractYouTubeVideoId } from "@steipete/summarize-core/content/url";
+import { extractYouTubeVideoId } from "@rvbuilds/summarize-core/content/url";
 import { applyPanelStateAction, type PanelStateAction } from "./panel-state-store";
 import { panelUrlsMatch } from "./session-policy";
 import { shouldSeedPlannedSlidesForRun } from "./slides-seed-policy";

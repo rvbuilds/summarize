@@ -3,7 +3,7 @@ import {
   isLoomVideoUrl,
   isYouTubeVideoUrl,
   shouldPreferUrlMode,
-} from "@steipete/summarize-core/content/url";
+} from "@rvbuilds/summarize-core/content/url";
 import { buildBrowserSummaryPayload } from "../../lib/browser-summary";
 import {
   buildDirectSummaryPrompt,

@@ -15,8 +15,8 @@ vi.mock("../src/content/index.js", () => ({
   createLinkPreviewClient,
 }));
 
-vi.mock("@steipete/summarize-core/content", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@steipete/summarize-core/content")>()),
+vi.mock("@rvbuilds/summarize-core/content", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@rvbuilds/summarize-core/content")>()),
   fetchYoutubeSourceMetrics,
 }));
 

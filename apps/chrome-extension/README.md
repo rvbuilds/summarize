@@ -70,7 +70,7 @@ Media/slides can independently use **Browser** or **Daemon**. Browser media uses
 ## Optional Daemon (Pairing)
 
 1. Install `summarize` (choose one):
-   - `npm i -g @steipete/summarize` (requires Node.js 24+)
+   - `npm i -g @rvbuilds/summarize` (requires Node.js 24+)
    - `brew install summarize` (macOS, Linux)
 2. Under **Options → Runtime → Daemon**, click **Enable local companion** and approve Chrome's
    optional **Communicate with cooperating native applications** permission. Switching either
@@ -84,7 +84,7 @@ Media/slides can independently use **Browser** or **Daemon**. Browser media uses
 5. Paste the command from the Setup screen and press Enter.
    - Installed binary: `summarize daemon install --token <TOKEN> --port 8787`
    - Repo/dev checkout: `pnpm summarize daemon install --token <TOKEN> --port 8787 --dev --extension-id <UNPACKED_ID>`
-   - The install registers native host `com.steipete.summarize` for the exact Web Store extension ID.
+   - The install registers native host `com.rvbuilds.summarize` for the exact Web Store extension ID.
    - Non-default port: replace `8787`, then enter the same port under **Options → Runtime → Daemon → Port**.
 6. Back in your browser, the Daemon runtime setup screen should disappear once the daemon is running.
 7. Verify / troubleshoot:

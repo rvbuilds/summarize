@@ -5,4 +5,4 @@ export {
   type SlidePresentationCard,
   type SlidePresentationLength,
   type SlidePresentationTextKind,
-} from "@steipete/summarize-core/slides";
+} from "@rvbuilds/summarize-core/slides";

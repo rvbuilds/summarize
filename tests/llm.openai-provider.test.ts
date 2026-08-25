@@ -557,7 +557,7 @@ describe("openai provider helpers", () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       expect(String(input)).toBe("https://openrouter.ai/api/v1/chat/completions");
       expect((init?.headers as Record<string, string>)?.["HTTP-Referer"]).toBe(
-        "https://github.com/steipete/summarize",
+        "https://github.com/rvbuilds/summarize",
       );
       expect((init?.headers as Record<string, string>)?.["X-Title"]).toBe("summarize");
       const body = JSON.parse(String(init?.body)) as {

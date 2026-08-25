@@ -1,4 +1,4 @@
-import { parseSseStream, type RawSseMessage } from "@steipete/summarize-core/runtime";
+import { parseSseStream, type RawSseMessage } from "@rvbuilds/summarize-core/runtime";
 import { daemonFetch } from "../../lib/daemon-fetch";
 import { getDaemonOrigin } from "../../lib/daemon-url";
 import { parseSseEvent, type SseSlidesData } from "../../lib/runtime-contracts";

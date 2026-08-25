@@ -1,7 +1,7 @@
 import type {
   AgentAssistantMessage as AssistantMessage,
   AgentMessage as Message,
-} from "@steipete/summarize-core/runtime";
+} from "@rvbuilds/summarize-core/runtime";
 
 export type AgentResponse = { ok: boolean; assistant?: AssistantMessage; error?: string };
 export type ChatHistoryResponse = { ok: boolean; messages?: Message[]; error?: string };

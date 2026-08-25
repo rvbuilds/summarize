@@ -68,9 +68,9 @@ const metadata = JSON.stringify({
 });
 if (metadata.includes("workspace:")) fail(`${packageName}@${version} tarball still contains workspace:* metadata`);
 if (expectedCoreDep) {
-  const actual = pkg.dependencies?.["@steipete/summarize-core"];
+  const actual = pkg.dependencies?.["@rvbuilds/summarize-core"];
   if (actual !== expectedCoreDep) {
-    fail(`Expected @steipete/summarize-core dependency ${expectedCoreDep}, got ${actual || "<missing>"}`);
+    fail(`Expected @rvbuilds/summarize-core dependency ${expectedCoreDep}, got ${actual || "<missing>"}`);
   }
 }
 NODE
@@ -151,8 +151,8 @@ phase_verify_pack() {
   local version tmp_dir tarball core_tarball install_dir node_path slides_dir fixture
   version="$(node -p 'require("./package.json").version')"
   tmp_dir="$(mktemp -d)"
-  core_tarball="${tmp_dir}/steipete-summarize-core-${version}.tgz"
-  tarball="${tmp_dir}/steipete-summarize-${version}.tgz"
+  core_tarball="${tmp_dir}/rvbuilds-summarize-core-${version}.tgz"
+  tarball="${tmp_dir}/rvbuilds-summarize-${version}.tgz"
   run pnpm -C packages/core pack --pack-destination "${tmp_dir}"
   run pnpm pack --pack-destination "${tmp_dir}"
   if [ ! -f "${core_tarball}" ]; then
@@ -163,18 +163,18 @@ phase_verify_pack() {
     echo "Missing ${tarball}"
     exit 1
   fi
-  verify_package_manifest "${core_tarball}" "@steipete/summarize-core" "${version}"
-  verify_package_manifest "${tarball}" "@steipete/summarize" "${version}" "${version}"
+  verify_package_manifest "${core_tarball}" "@rvbuilds/summarize-core" "${version}"
+  verify_package_manifest "${tarball}" "@rvbuilds/summarize" "${version}" "${version}"
   install_dir="${tmp_dir}/install"
   run mkdir -p "${install_dir}"
   run npm install --prefix "${install_dir}" "${core_tarball}" "${tarball}"
-  run node "${install_dir}/node_modules/@steipete/summarize/dist/cli.js" --help >/dev/null
+  run node "${install_dir}/node_modules/@rvbuilds/summarize/dist/cli.js" --help >/dev/null
   node_path="$(command -v node)"
   slides_dir="${tmp_dir}/slides"
   fixture="$(pwd)/apps/chrome-extension/tests/fixtures/ffmpeg-wasm-sample.mp4"
   run mkdir -p "${tmp_dir}/empty-bin"
   run env PATH="${tmp_dir}/empty-bin" "${node_path}" \
-    "${install_dir}/node_modules/@steipete/summarize/dist/cli.js" \
+    "${install_dir}/node_modules/@rvbuilds/summarize/dist/cli.js" \
     slides "${fixture}" --slides-dir "${slides_dir}" --slides-max 1 --render none
   if ! find "${slides_dir}" -name '*.png' -type f -size +0c | grep -q .; then
     echo "Installed package FFmpeg WebAssembly fallback produced no slides."
@@ -232,8 +232,8 @@ phase_publish() {
   if [ -n "${NPM_OTP:-}" ]; then
     otp_args=(--otp "${NPM_OTP}")
   fi
-  ensure_npm_version_absent "@steipete/summarize-core" "${version}"
-  ensure_npm_version_absent "@steipete/summarize" "${version}"
+  ensure_npm_version_absent "@rvbuilds/summarize-core" "${version}"
+  ensure_npm_version_absent "@rvbuilds/summarize" "${version}"
   phase_verify_pack
   run bash -c 'cd packages/core && pnpm publish --tag next --access public "$@"' bash ${otp_args[@]+"${otp_args[@]}"}
   run pnpm publish --tag next --access public ${otp_args[@]+"${otp_args[@]}"}
@@ -246,15 +246,15 @@ phase_smoke() {
   require_lockstep_versions
   local version core_version core_dep cli_version dlx_version
   version="$(package_version)"
-  core_version="$(npm view "@steipete/summarize-core@${version}" version)"
-  cli_version="$(npm view "@steipete/summarize@${version}" version)"
-  core_dep="$(npm view "@steipete/summarize@${version}" dependencies.@steipete/summarize-core)"
+  core_version="$(npm view "@rvbuilds/summarize-core@${version}" version)"
+  cli_version="$(npm view "@rvbuilds/summarize@${version}" version)"
+  core_dep="$(npm view "@rvbuilds/summarize@${version}" dependencies.@rvbuilds/summarize-core)"
   if [ "${core_version}" != "${version}" ] || [ "${cli_version}" != "${version}" ]; then
     echo "npm exact-version lookup failed for ${version}: core=${core_version:-missing} cli=${cli_version:-missing}"
     exit 1
   fi
   if [ "${core_dep}" != "${version}" ]; then
-    echo "Published CLI depends on @steipete/summarize-core=${core_dep:-missing}; expected ${version}"
+    echo "Published CLI depends on @rvbuilds/summarize-core=${core_dep:-missing}; expected ${version}"
     echo "Emergency path: do not tag/release. Deprecate this version and ship a patch."
     exit 1
   fi
@@ -266,14 +266,14 @@ phase_smoke() {
       ;;
   esac
   dlx_version="$(
-    pnpm --config.minimum-release-age=0 -s dlx "@steipete/summarize@${version}" --version
+    pnpm --config.minimum-release-age=0 -s dlx "@rvbuilds/summarize@${version}" --version
   )"
   if [ "${dlx_version}" != "${version}" ]; then
     echo "pnpm dlx reported ${dlx_version}, expected ${version}"
     exit 1
   fi
   run bash -c \
-    "pnpm --config.minimum-release-age=0 -s dlx @steipete/summarize@${version} --help >/dev/null"
+    "pnpm --config.minimum-release-age=0 -s dlx @rvbuilds/summarize@${version} --help >/dev/null"
   echo "ok"
 }
 
@@ -286,10 +286,10 @@ phase_promote_latest() {
   if [ -n "${NPM_OTP:-}" ]; then
     otp_args=(--otp "${NPM_OTP}")
   fi
-  run npm dist-tag add "@steipete/summarize-core@${version}" latest ${otp_args[@]+"${otp_args[@]}"}
-  run npm dist-tag add "@steipete/summarize@${version}" latest ${otp_args[@]+"${otp_args[@]}"}
-  run npm view @steipete/summarize dist-tags.latest
-  run npm view @steipete/summarize-core dist-tags.latest
+  run npm dist-tag add "@rvbuilds/summarize-core@${version}" latest ${otp_args[@]+"${otp_args[@]}"}
+  run npm dist-tag add "@rvbuilds/summarize@${version}" latest ${otp_args[@]+"${otp_args[@]}"}
+  run npm view @rvbuilds/summarize dist-tags.latest
+  run npm view @rvbuilds/summarize-core dist-tags.latest
 }
 
 phase_deprecate() {
@@ -299,14 +299,14 @@ phase_deprecate() {
   local -a otp_args=()
   bad_version="${BAD_VERSION:-}"
   if [ -z "${bad_version}" ]; then
-    echo "Set BAD_VERSION=<version> to deprecate @steipete/summarize@<version>."
+    echo "Set BAD_VERSION=<version> to deprecate @rvbuilds/summarize@<version>."
     exit 2
   fi
   message="${DEPRECATE_MESSAGE:-Broken package metadata. Use a newer version.}"
   if [ -n "${NPM_OTP:-}" ]; then
     otp_args=(--otp "${NPM_OTP}")
   fi
-  run npm deprecate "@steipete/summarize@${bad_version}" "${message}" ${otp_args[@]+"${otp_args[@]}"}
+  run npm deprecate "@rvbuilds/summarize@${bad_version}" "${message}" ${otp_args[@]+"${otp_args[@]}"}
   echo "ok"
 }
 
@@ -414,7 +414,7 @@ case "$PHASE" in
     echo "  publish   pnpm publish --tag next, smoke exact version, then promote latest"
     echo "  smoke     npm exact-version metadata + pnpm dlx --version/--help"
     echo "  promote   npm dist-tag add current version as latest"
-    echo "  deprecate deprecate @steipete/summarize@BAD_VERSION"
+    echo "  deprecate deprecate @rvbuilds/summarize@BAD_VERSION"
     echo "  tag       git tag vX.Y.Z + push tags"
     echo "  github    verify the CI-published GitHub Release and required assets"
     echo "  homebrew  verify Homebrew/core formula has current version"

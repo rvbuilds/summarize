@@ -17,7 +17,7 @@ Quickstart:
 - Configured direct providers support summaries, chat, automation, hover summaries, and public-URL extraction without a daemon. Provider keys stay in extension-local storage.
 - Browser media provides daemonless transcription, slide extraction, and Gemini Nano per-slide summaries. OCR, process/log tools, CLI fallbacks, and broader native media support require the daemon.
 - Optional: install summarize for daemon-backed media support:
-  - `npm i -g @steipete/summarize`
+  - `npm i -g @rvbuilds/summarize`
   - `brew install summarize` (macOS, Linux)
 - Firefox sidebar build: `pnpm -C apps/chrome-extension build:firefox` (load via `about:debugging` → temporary add-on)
 - Open side panel → copy token install command → run for daemon mode:
@@ -101,7 +101,7 @@ Dev (repo checkout):
   - HTTP server on `127.0.0.1` (default port `8787`).
   - Token-authenticated API.
   - Runs the existing summarize pipeline (env/config-based) and streams tokens to client via SSE.
-  - Native host `com.steipete.summarize` proxies only `/health` and `/v1/*` to the configured daemon port and preserves SSE and binary responses.
+  - Native host `com.rvbuilds.summarize` proxies only `/health` and `/v1/*` to the configured daemon port and preserves SSE and binary responses.
   - Port is configurable: set **Options → Runtime → Daemon → Port** to match a daemon started with `summarize daemon install --port <n>`.
 
 ## Data Flow

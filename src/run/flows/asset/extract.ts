@@ -1,4 +1,4 @@
-import { applyContentBudget } from "@steipete/summarize-core/content";
+import { applyContentBudget } from "@rvbuilds/summarize-core/content";
 import type { ExecFileFn } from "../../../markitdown.js";
 import { convertToMarkdownWithMarkitdown } from "../../../markitdown.js";
 import { formatBytes } from "../../../tty/format.js";

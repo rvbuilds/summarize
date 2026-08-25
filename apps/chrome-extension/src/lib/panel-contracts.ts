@@ -1,7 +1,7 @@
 import type {
   AgentAssistantMessage as AssistantMessage,
   AgentMessage as Message,
-} from "@steipete/summarize-core/runtime";
+} from "@rvbuilds/summarize-core/runtime";
 import type { OptionsTab } from "./options-tabs";
 import type { SseSlidesData } from "./runtime-contracts";
 

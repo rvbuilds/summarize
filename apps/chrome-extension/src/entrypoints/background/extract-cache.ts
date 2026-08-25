@@ -1,4 +1,4 @@
-import { shouldPreferUrlMode } from "@steipete/summarize-core/content/url";
+import { shouldPreferUrlMode } from "@rvbuilds/summarize-core/content/url";
 import { daemonOrigin } from "../../lib/daemon-url";
 import { createCachedExtract, type CachedExtract } from "./cached-extract";
 import type { ExtractResponse } from "./content-script-bridge";

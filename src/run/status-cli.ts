@@ -1,4 +1,4 @@
-import { isOpenRouterBaseUrl } from "@steipete/summarize-core";
+import { isOpenRouterBaseUrl } from "@rvbuilds/summarize-core";
 import { resolveEnvState } from "../application/environment-state.js";
 import { resolveCliAvailability, resolveExecutableInPath } from "../application/environment.js";
 import { resolveProviderRuntimeBindings } from "../application/provider-runtime.js";

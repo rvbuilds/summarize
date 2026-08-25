@@ -1,5 +1,5 @@
 {
-  "name": "@steipete/summarize-core",
+  "name": "@rvbuilds/summarize-core",
   "version": "0.21.11",
   "description": "Summarize core library (content extraction + prompts).",
   "files": [

@@ -1,4 +1,4 @@
-import { isOpenRouterBaseUrl, resolveConfiguredBaseUrl } from "@steipete/summarize-core";
+import { isOpenRouterBaseUrl, resolveConfiguredBaseUrl } from "@rvbuilds/summarize-core";
 import type { CliProvider, SummarizeConfig } from "../config.js";
 import { DEFAULT_MINIMAX_BASE_URL, DEFAULT_OLLAMA_BASE_URL } from "../llm/provider-profile.js";
 import { resolveCliAvailability, resolveExecutableInPath } from "./environment.js";

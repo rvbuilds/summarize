@@ -1,4 +1,4 @@
-import { parseTranscriptTimedText } from "@steipete/summarize-core/slides";
+import { parseTranscriptTimedText } from "@rvbuilds/summarize-core/slides";
 import { buildSlidesCacheKey } from "../../../cache.js";
 import type { ExtractedLinkContent } from "../../../content/index.js";
 import {

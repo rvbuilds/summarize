@@ -1,4 +1,4 @@
-import { shouldPreferUrlMode } from "@steipete/summarize-core/content/url";
+import { shouldPreferUrlMode } from "@rvbuilds/summarize-core/content/url";
 import type MarkdownIt from "markdown-it";
 import { logExtensionEvent } from "../../lib/extension-logs";
 import type { SseSlidesData } from "../../lib/runtime-contracts";

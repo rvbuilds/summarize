@@ -2,7 +2,7 @@ import type {
   AgentAssistantMessage as AssistantMessage,
   AgentMessage as Message,
   AgentTool as Tool,
-} from "@steipete/summarize-core/runtime";
+} from "@rvbuilds/summarize-core/runtime";
 import { streamAnthropic } from "./direct-provider/anthropic";
 import { resolveDirectModel, type DirectModelConfig } from "./direct-provider/config";
 import { streamGoogle } from "./direct-provider/google";

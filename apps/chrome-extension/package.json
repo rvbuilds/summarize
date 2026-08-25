@@ -1,5 +1,5 @@
 {
-  "name": "@steipete/summarize-chrome-extension",
+  "name": "@rvbuilds/summarize-chrome-extension",
   "version": "0.17.1",
   "private": true,
   "type": "module",
@@ -22,7 +22,7 @@
   "dependencies": {
     "@huggingface/transformers": "4.2.0",
     "@mozilla/readability": "0.6.0",
-    "@steipete/summarize-core": "workspace:*",
+    "@rvbuilds/summarize-core": "workspace:*",
     "googlevideo": "4.1.1",
     "markdown-it": "^15.0.0",
     "mediabunny": "1.54.0",

@@ -1,4 +1,4 @@
-export type { SummaryLength } from "@steipete/summarize-core";
+export type { SummaryLength } from "@rvbuilds/summarize-core";
 export {
   parseSseEvent,
   type RawSseMessage,
@@ -6,5 +6,5 @@ export {
   type SseMetaData,
   type SseMetricsData,
   type SseSlidesData,
-} from "@steipete/summarize-core/runtime";
-export { mergeStreamingChunk } from "@steipete/summarize-core/runtime";
+} from "@rvbuilds/summarize-core/runtime";
+export { mergeStreamingChunk } from "@rvbuilds/summarize-core/runtime";

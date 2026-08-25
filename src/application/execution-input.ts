@@ -1,6 +1,6 @@
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { isDirectVideoInput } from "@steipete/summarize-core/content/url";
+import { isDirectVideoInput } from "@rvbuilds/summarize-core/content/url";
 import { MAX_PDF_EXTRACT_BYTES } from "../run/constants.js";
 import {
   acquireLocalAssetInput,

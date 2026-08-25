@@ -1,5 +1,5 @@
-import { isTwitterStatusUrl, isYouTubeUrl } from "@steipete/summarize-core/content/url";
-import { normalizeSummarySlideHeadings } from "@steipete/summarize-core/slides";
+import { isTwitterStatusUrl, isYouTubeUrl } from "@rvbuilds/summarize-core/content/url";
+import { normalizeSummarySlideHeadings } from "@rvbuilds/summarize-core/slides";
 import { resolveModelAttempts } from "../application/model-attempts.js";
 import {
   buildLanguageKey,

@@ -1,4 +1,4 @@
-import { isDirectMediaUrl } from "@steipete/summarize-core/content/url";
+import { isDirectMediaUrl } from "@rvbuilds/summarize-core/content/url";
 import type { BrowserMediaTranscriptionDiagnostics } from "../offscreen/media-transcription";
 import { ensureOffscreenDocument, isBrowserMediaUrl } from "./browser-media";
 import { getPrimaryMediaInfoInTab } from "./content-script-bridge";

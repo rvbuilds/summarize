@@ -1,4 +1,4 @@
-import { isYouTubeUrl } from "@steipete/summarize-core/content/url";
+import { isYouTubeUrl } from "@rvbuilds/summarize-core/content/url";
 import {
   formatCompactCount,
   formatDurationSecondsSmart,

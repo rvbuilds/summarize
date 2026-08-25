@@ -1,10 +1,10 @@
-import { resolveOutputLanguage } from "@steipete/summarize-core/language";
+import { resolveOutputLanguage } from "@rvbuilds/summarize-core/language";
 import {
   buildLinkSummaryPrompt,
   SUMMARY_LENGTH_TO_TOKENS,
   type SummaryLength,
-} from "@steipete/summarize-core/prompts";
-import type { AgentMessage as Message, AgentTool as Tool } from "@steipete/summarize-core/runtime";
+} from "@rvbuilds/summarize-core/prompts";
+import type { AgentMessage as Message, AgentTool as Tool } from "@rvbuilds/summarize-core/runtime";
 import { hasDebuggerCapability } from "./automation-capabilities";
 import type { Settings } from "./settings";
 

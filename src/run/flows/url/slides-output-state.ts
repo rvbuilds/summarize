@@ -1,4 +1,4 @@
-import type { SlideTimelineEntry } from "@steipete/summarize-core/slides";
+import type { SlideTimelineEntry } from "@rvbuilds/summarize-core/slides";
 import type { SlideImage, SlideExtractionResult } from "../../../slides/index.js";
 
 export type SlideState = SlideTimelineEntry & { imagePath: string | null };

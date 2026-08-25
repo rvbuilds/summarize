@@ -5,7 +5,7 @@ import {
   readDnsPinnedAddresses,
   resolveDnsPinnedFetch,
   supportsDnsPinnedFetch,
-} from "@steipete/summarize-core/content";
+} from "@rvbuilds/summarize-core/content";
 import { describe, expect, it, vi } from "vitest";
 import { createRunMetrics } from "../src/application/metrics.js";
 

@@ -1,4 +1,4 @@
-import { isYouTubeUrl } from "@steipete/summarize-core/content/url";
+import { isYouTubeUrl } from "@rvbuilds/summarize-core/content/url";
 import type { ExtractedLinkContent } from "../content/index.js";
 import { buildUrlPrompt } from "../engine/web-prompt.js";
 import { resolveUrlSummaryExecution, type UrlSummaryResolution } from "../engine/web-summary.js";

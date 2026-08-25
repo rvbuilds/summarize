@@ -3,7 +3,7 @@ import {
   buildTimestampUrl,
   formatOsc8Link,
   formatTimestamp,
-} from "@steipete/summarize-core/slides";
+} from "@rvbuilds/summarize-core/slides";
 import type { SlideExtractionResult } from "../../../slides/index.js";
 import type { SlideState } from "./slides-output-state.js";
 

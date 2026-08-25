@@ -5,7 +5,7 @@ import {
   isDirectMediaExtension,
   isDirectMediaUrl,
   isDirectVideoInput,
-} from "@steipete/summarize-core/content/url";
+} from "@rvbuilds/summarize-core/content/url";
 import mime from "mime";
 import {
   classifyUrl,

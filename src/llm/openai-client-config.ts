@@ -1,4 +1,4 @@
-import { isOpenRouterBaseUrl, normalizeBaseUrl } from "@steipete/summarize-core";
+import { isOpenRouterBaseUrl, normalizeBaseUrl } from "@rvbuilds/summarize-core";
 import type { ModelRequestOptions } from "./model-options.js";
 import type { OpenAiClientConfig } from "./providers/types.js";
 

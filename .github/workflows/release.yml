@@ -66,8 +66,8 @@ jobs:
             echo "CHANGELOG.md lacks a dated $version section" >&2
             exit 1
           }
-          [[ "$(npm view "@steipete/summarize@$version" version)" == "$version" ]]
-          [[ "$(npm view "@steipete/summarize-core@$version" version)" == "$version" ]]
+          [[ "$(npm view "@rvbuilds/summarize@$version" version)" == "$version" ]]
+          [[ "$(npm view "@rvbuilds/summarize-core@$version" version)" == "$version" ]]
           successful_ci=$(gh api \
             "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$target_sha&status=completed&per_page=100" \
             --jq '[.workflow_runs[] | select(.event == "push" and .conclusion == "success")] | length')
@@ -123,7 +123,7 @@ jobs:
           MACOS_SIGNING_P12_PASSWORD: ${{ secrets.MACOS_SIGNING_P12_PASSWORD }}
         run: |
           set -euo pipefail
-          expected_identity='Developer ID Application: Peter Steinberger (Y5PE65HELJ)'
+          expected_identity='Developer ID Application: Rudra Varma (Y5PE65HELJ)'
           keychain="$RUNNER_TEMP/summarize-release.keychain-db"
           keychain_phrase=$(openssl rand -hex 24)
           p12="$RUNNER_TEMP/summarize-release.p12"

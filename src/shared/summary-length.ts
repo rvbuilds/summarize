@@ -1,4 +1,4 @@
-import type { SummaryLength } from "@steipete/summarize-core";
+import type { SummaryLength } from "@rvbuilds/summarize-core";
 
 export type SummaryLengthArg =
   | { kind: "preset"; preset: SummaryLength }

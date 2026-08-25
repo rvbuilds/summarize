@@ -54,7 +54,7 @@ describe("package scripts", () => {
     expect(rootPackage.scripts.s).toBe("pnpm dev:cli");
     expect(rootPackage.scripts.summarize).toBe("pnpm dev:cli");
     expect(registerTypeScript).toContain('"packages", "core", "src"');
-    expect(registerTypeScript).toContain('"@steipete/summarize-core/"');
+    expect(registerTypeScript).toContain('"@rvbuilds/summarize-core/"');
   });
 
   it("uses Node-native TypeScript without tsx or esbuild", () => {

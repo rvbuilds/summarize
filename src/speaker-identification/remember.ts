@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { promises as fs } from "node:fs";
 import { dirname, join } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
-import { formatTimestampMs } from "@steipete/summarize-core/content";
+import { formatTimestampMs } from "@rvbuilds/summarize-core/content";
 import { isRecord } from "../config/parse-helpers.js";
 import { readParsedConfigFile } from "../config/read.js";
 import type { SpeakerIdentificationSettings, SpeakerIdentityMapping } from "./types.js";

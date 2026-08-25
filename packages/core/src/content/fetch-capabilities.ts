@@ -1,5 +1,5 @@
-const DNS_PINNED_FETCH = Symbol.for("@steipete/summarize.dnsPinnedFetch");
-const DNS_PINNED_ADDRESSES = Symbol.for("@steipete/summarize.dnsPinnedAddresses");
+const DNS_PINNED_FETCH = Symbol.for("@rvbuilds/summarize.dnsPinnedFetch");
+const DNS_PINNED_ADDRESSES = Symbol.for("@rvbuilds/summarize.dnsPinnedAddresses");
 
 export type DnsPinnedAddress = { address: string; family?: number };
 

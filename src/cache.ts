@@ -9,7 +9,7 @@ import {
   parseCacheJson,
   type CacheKind,
   type CacheStats,
-} from "@steipete/summarize-core/runtime";
+} from "@rvbuilds/summarize-core/runtime";
 import {
   buildAttachmentContentHash,
   buildExtractCacheKeyValue,
@@ -48,7 +48,7 @@ export {
   DEFAULT_CACHE_TTL_DAYS,
   type CacheKind,
   type CacheStats,
-} from "@steipete/summarize-core/runtime";
+} from "@rvbuilds/summarize-core/runtime";
 import { cleanupSlidesPayload, collectSlidesPayloadArtifactPaths } from "./cache-slides-cleanup.js";
 import type { TranscriptCache, TranscriptSource } from "./content/index.js";
 

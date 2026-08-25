@@ -1,4 +1,4 @@
-import type { ConvertHtmlToMarkdown } from "@steipete/summarize-core/content";
+import type { ConvertHtmlToMarkdown } from "@rvbuilds/summarize-core/content";
 import type { LlmTokenUsage } from "./generate-text.js";
 import { generateTextWithModelId } from "./generate-text.js";
 import type { LlmProvider } from "./model-id.js";

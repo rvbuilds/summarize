@@ -10,7 +10,7 @@ read_when:
 # Disable the local companion in managed Chrome
 
 The Chrome Web Store extension ID is `cejgnmmhbbpdmjnfppjdfkocebngehfg`. The registered native
-messaging host is `com.steipete.summarize`, and its manifest allows only this exact origin:
+messaging host is `com.rvbuilds.summarize`, and its manifest allows only this exact origin:
 
 ```json
 {
@@ -44,7 +44,7 @@ Example Linux managed policy at `/etc/opt/chrome/policies/managed/summarize.json
       "runtime_blocked_hosts": ["http://localhost", "http://127.0.0.1", "http://[::1]"]
     }
   },
-  "NativeMessagingBlocklist": ["com.steipete.summarize"],
+  "NativeMessagingBlocklist": ["com.rvbuilds.summarize"],
   "NativeMessagingUserLevelHosts": false,
   "3rdparty": {
     "extensions": {
@@ -84,7 +84,7 @@ On Windows, configure the equivalent values under:
 
 - `HKLM\Software\Policies\Google\Chrome\ExtensionSettings` with the JSON dictionary above.
 - `HKLM\Software\Policies\Google\Chrome\NativeMessagingBlocklist\1` as the string
-  `com.steipete.summarize` (or `*`).
+  `com.rvbuilds.summarize` (or `*`).
 - `HKLM\Software\Policies\Google\Chrome\NativeMessagingUserLevelHosts` as DWORD `0`.
 - `HKLM\Software\Policies\Google\Chrome\3rdparty\extensions\cejgnmmhbbpdmjnfppjdfkocebngehfg\policy`
   with `daemonAllowed` as DWORD `0`.
@@ -107,7 +107,7 @@ and confirm:
 - Direct remains selected for AI and Browser remains selected for media.
 - Daemon controls are disabled and no permission prompt appears.
 - Chrome rejects `nativeMessaging` for extension ID `cejgnmmhbbpdmjnfppjdfkocebngehfg`.
-- Chrome refuses to launch `com.steipete.summarize` when its host block applies.
+- Chrome refuses to launch `com.rvbuilds.summarize` when its host block applies.
 - Chrome blocks the extension from local HTTP origins when `runtime_blocked_hosts` applies.
 
 `daemonAllowed=false` is UX and fail-closed application behavior, not a substitute for the Chrome

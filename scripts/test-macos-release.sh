@@ -30,13 +30,13 @@ cat >"$MOCK_BIN/codesign" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 printf 'codesign %s\n' "$*" >>"$MOCK_LOG"
-authority=${MOCK_AUTHORITY:-Developer ID Application: Peter Steinberger (Y5PE65HELJ)}
-requirement=${MOCK_REQUIREMENT:-'identifier "com.steipete.summarize.cli" and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = Y5PE65HELJ'}
+authority=${MOCK_AUTHORITY:-Developer ID Application: Rudra Varma (Y5PE65HELJ)}
+requirement=${MOCK_REQUIREMENT:-'identifier "com.rvbuilds.summarize.cli" and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = Y5PE65HELJ'}
 case " $* " in
   *' -dvvv '*)
     cat <<META
 Executable=test
-Identifier=com.steipete.summarize.cli
+Identifier=com.rvbuilds.summarize.cli
 CodeDirectory v=20500 size=1 flags=0x10000(runtime) hashes=1+7 location=embedded
 Authority=$authority
 Timestamp=Jul 18, 2026 at 4:00:00 PM
@@ -65,7 +65,7 @@ cat >"$MOCK_BIN/csreq" <<'EOF'
 set -euo pipefail
 [[ "${1:-}" != -r==* ]] || exit 2
 case "$*" in
-  *com.steipete.summarize.cli*Y5PE65HELJ*) echo 'canonical release requirement' ;;
+  *com.rvbuilds.summarize.cli*Y5PE65HELJ*) echo 'canonical release requirement' ;;
   *) echo 'canonical non-policy requirement' ;;
 esac
 EOF
@@ -115,7 +115,7 @@ COMMON_ENV=(
   PATH="$MOCK_BIN:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
   MOCK_LOG="$LOG"
   SUMMARIZE_OFFICIAL_RELEASE=1
-  CODESIGN_IDENTITY="Developer ID Application: Peter Steinberger (Y5PE65HELJ)"
+  CODESIGN_IDENTITY="Developer ID Application: Rudra Varma (Y5PE65HELJ)"
   CODESIGN_KEYCHAIN="$TEST_DIR/release.keychain-db"
   ASC_KEY_ID=ABCDEFGHIJ
   ASC_ISSUER_ID=11111111-2222-3333-4444-555555555555
@@ -124,7 +124,7 @@ COMMON_ENV=(
 
 env "${COMMON_ENV[@]}" "$ROOT/scripts/codesign-macos.sh" "$TEST_DIR/stage/summarize" arm64
 grep -F -- '--options runtime' "$LOG" >/dev/null || fail "codesign skipped hardened runtime"
-grep -F -- '--identifier com.steipete.summarize.cli' "$LOG" >/dev/null || fail "codesign skipped stable identifier"
+grep -F -- '--identifier com.rvbuilds.summarize.cli' "$LOG" >/dev/null || fail "codesign skipped stable identifier"
 grep -F -- '--entitlements' "$LOG" >/dev/null || fail "codesign skipped Bun entitlements"
 grep -F -- 'notarytool submit' "$LOG" >/dev/null || fail "notarytool was not invoked"
 grep -F -- '--check-notarization -R=notarized' "$LOG" >/dev/null || fail "online notarization was not verified"

@@ -1,7 +1,7 @@
 import type {
   AgentAssistantMessage as AssistantMessage,
   AgentMessage as Message,
-} from "@steipete/summarize-core/runtime";
+} from "@rvbuilds/summarize-core/runtime";
 import { readAgentResponse } from "../../lib/agent-response";
 import { buildChatPageContent } from "../../lib/chat-context";
 import { daemonOrigin } from "../../lib/daemon-url";

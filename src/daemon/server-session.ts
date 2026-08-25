@@ -1,4 +1,4 @@
-import { type SseEvent, type SseSlidesData } from "@steipete/summarize-core/runtime";
+import { type SseEvent, type SseSlidesData } from "@rvbuilds/summarize-core/runtime";
 import type { SlideExtractionResult } from "../slides/index.js";
 import {
   closeBufferedSseChannel,

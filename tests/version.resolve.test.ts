@@ -41,7 +41,7 @@ describe("resolveGitSha", () => {
   it("does not escape an installed package root", () => {
     const root = fs.mkdtempSync(join(tmpdir(), "summarize-version-package-"));
     const appRoot = join(root, "app");
-    const packageRoot = join(appRoot, "node_modules", "@steipete", "summarize");
+    const packageRoot = join(appRoot, "node_modules", "@rvbuilds", "summarize");
     const modulePath = join(packageRoot, "dist", "esm", "run", "runner.js");
 
     try {

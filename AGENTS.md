@@ -7,15 +7,15 @@
 
 - Monorepo (pnpm workspace).
 - Packages:
-  - `@steipete/summarize` = CLI + UX (TTY/progress/streaming). Depends on core.
-  - `@steipete/summarize-core` (`packages/core`) = library surface for programmatic use (Sweetistics etc). No CLI entrypoints.
+  - `@rvbuilds/summarize` = CLI + UX (TTY/progress/streaming). Depends on core.
+  - `@rvbuilds/summarize-core` (`packages/core`) = library surface for programmatic use (Sweetistics etc). No CLI entrypoints.
 - Versioning: lockstep versions; publish order: core first, then CLI (`scripts/release.sh` / `RELEASING.md`).
 - Homebrew/core formula is not owned here; BrewTestBot autobumps releases about every 3h. Do not block or manually manage it; ship and continue.
 - Chrome Web Store: every release must upload the matching `dist-chrome/summarize-chrome-extension-v<version>.zip` to item `cejgnmmhbbpdmjnfppjdfkocebngehfg`, submit it for review with automatic publishing, and verify the exact pending/published version. Skip only when every shipped change is daemon-side and the packaged extension/companion contract is unchanged.
 - Dev:
   - Build: `pnpm -s build` (builds core first)
   - Gate: `pnpm -s check`
-  - Import from apps: prefer `@steipete/summarize-core` to avoid pulling CLI-only deps.
+  - Import from apps: prefer `@rvbuilds/summarize-core` to avoid pulling CLI-only deps.
 - Dependencies: stable releases need a 7-day stabilization delay before adoption; prereleases remain excluded unless already adopted.
 - Daemon: restart with `pnpm -s summarize daemon restart`; verify via `pnpm -s summarize daemon status`.
 - Rebuild (extension + daemon): run **both** in order:

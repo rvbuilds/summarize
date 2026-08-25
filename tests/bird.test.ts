@@ -88,7 +88,7 @@ describe("tweet CLI helpers", () => {
         },
       },
       includes: {
-        users: [{ id: "99", username: "steipete", name: "Peter" }],
+        users: [{ id: "99", username: "rvbuilds", name: "Peter" }],
         media: [
           { media_key: "7_2", type: "photo", url: "https://pbs.twimg.com/ignored.jpg" },
           {
@@ -112,14 +112,14 @@ describe("tweet CLI helpers", () => {
     };
     const { binDir } = makeCliScript("xurl", scriptForJson(payload));
     const result = await readTweetWithXurl({
-      url: "https://x.com/steipete/status/2",
+      url: "https://x.com/rvbuilds/status/2",
       timeoutMs: TEST_CLI_TIMEOUT_MS,
       env: { PATH: binDir },
     });
 
     expect(result.client).toBe("xurl");
     expect(result.text).toBe("Hello from xurl");
-    expect(result.author?.username).toBe("steipete");
+    expect(result.author?.username).toBe("rvbuilds");
     expect(result.media?.source).toBe("xurl");
     expect(result.media?.preferredUrl).toBe("https://video.twimg.com/high.mp4");
   });
@@ -135,12 +135,12 @@ describe("tweet CLI helpers", () => {
         author_id: "99",
       },
       includes: {
-        users: [{ id: "99", username: "steipete", name: "Peter" }],
+        users: [{ id: "99", username: "rvbuilds", name: "Peter" }],
       },
     };
     const { binDir: noteDir } = makeCliScript("xurl", scriptForJson(noteTweetPayload));
     const noteResult = await readTweetWithXurl({
-      url: "https://x.com/steipete/status/5",
+      url: "https://x.com/rvbuilds/status/5",
       timeoutMs: TEST_CLI_TIMEOUT_MS,
       env: { PATH: noteDir },
     });
@@ -157,12 +157,12 @@ describe("tweet CLI helpers", () => {
         author_id: "99",
       },
       includes: {
-        users: [{ id: "99", username: "steipete", name: "Peter" }],
+        users: [{ id: "99", username: "rvbuilds", name: "Peter" }],
       },
     };
     const { binDir: articleDir } = makeCliScript("xurl", scriptForJson(articlePayload));
     const articleResult = await readTweetWithXurl({
-      url: "https://x.com/steipete/status/6",
+      url: "https://x.com/rvbuilds/status/6",
       timeoutMs: TEST_CLI_TIMEOUT_MS,
       env: { PATH: articleDir },
     });

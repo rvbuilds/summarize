@@ -83,4 +83,4 @@ Save defaults in `~/.summarize/config.json` and override per-invocation with fla
 
 ## Project
 
-Active development; the [changelog](https://github.com/steipete/summarize/blob/main/CHANGELOG.md) tracks recent releases. Released under the [MIT license](https://github.com/steipete/summarize/blob/main/LICENSE). Source at [github.com/steipete/summarize](https://github.com/steipete/summarize). The Chrome extension is on the [Chrome Web Store](https://chromewebstore.google.com/detail/summarize/cejgnmmhbbpdmjnfppjdfkocebngehfg).
+Active development; the [changelog](https://github.com/rvbuilds/summarize/blob/main/CHANGELOG.md) tracks recent releases. Released under the [MIT license](https://github.com/rvbuilds/summarize/blob/main/LICENSE). Source at [github.com/rvbuilds/summarize](https://github.com/rvbuilds/summarize). The Chrome extension is on the [Chrome Web Store](https://chromewebstore.google.com/detail/summarize/cejgnmmhbbpdmjnfppjdfkocebngehfg).

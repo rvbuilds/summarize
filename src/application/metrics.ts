@@ -1,10 +1,10 @@
-import { fetchWithDnsPinnedAddresses } from "@steipete/summarize-core/content";
+import { fetchWithDnsPinnedAddresses } from "@rvbuilds/summarize-core/content";
 import {
   isNativeOrBoundGlobalFetch,
   markFetchAsDnsPinned,
   resolveDnsPinnedFetch,
   supportsDnsPinnedFetch,
-} from "@steipete/summarize-core/content";
+} from "@rvbuilds/summarize-core/content";
 import { normalizeTokenUsage, tallyCosts } from "tokentally";
 import { fetch as undiciFetch } from "undici";
 import type { LlmCall, RunMetricsReport } from "../costs.js";

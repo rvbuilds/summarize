@@ -1,4 +1,4 @@
-import type { SummaryLength } from "@steipete/summarize-core";
+import type { SummaryLength } from "@rvbuilds/summarize-core";
 import type { ExtractedLinkContent } from "../../../content/index.js";
 import type { SummaryStreamHandler } from "../../../engine/events.js";
 import type { SlideExtractionResult, SlideImage, SlideSourceKind } from "../../../slides/index.js";

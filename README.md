@@ -1,9 +1,9 @@
 # Summarize 📝 — Link in, signal out.
 
-[![CI](https://img.shields.io/github/actions/workflow/status/steipete/summarize/ci.yml?branch=main&style=flat-square&label=ci)](https://github.com/steipete/summarize/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/@steipete/summarize?style=flat-square)](https://www.npmjs.com/package/@steipete/summarize)
-[![Node](https://img.shields.io/node/v/@steipete/summarize?style=flat-square)](https://nodejs.org/)
-[![License](https://img.shields.io/github/license/steipete/summarize?style=flat-square)](LICENSE)
+[![CI](https://img.shields.io/github/actions/workflow/status/rvbuilds/summarize/ci.yml?branch=main&style=flat-square&label=ci)](https://github.com/rvbuilds/summarize/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/@rvbuilds/summarize?style=flat-square)](https://www.npmjs.com/package/@rvbuilds/summarize)
+[![Node](https://img.shields.io/node/v/@rvbuilds/summarize?style=flat-square)](https://nodejs.org/)
+[![License](https://img.shields.io/github/license/rvbuilds/summarize?style=flat-square)](LICENSE)
 
 Summarize extracts clean text and produces summaries from web pages, files, YouTube videos, podcasts, and other audio or video. Use it from the Node.js CLI or from the Chrome Side Panel and Firefox Sidebar.
 
@@ -20,20 +20,20 @@ This domain is for use in documentation examples without needing permission. Avo
 Run it once without installing:
 
 ```bash
-npx -y @steipete/summarize --version
+npx -y @rvbuilds/summarize --version
 ```
 
 Or install the CLI with npm or Homebrew:
 
 ```bash
-npm install --global @steipete/summarize
+npm install --global @rvbuilds/summarize
 ```
 
 ```bash
 brew install summarize
 ```
 
-The npm package requires Node.js 24 or newer. Homebrew/core and the [macOS archives on GitHub Releases](https://github.com/steipete/summarize/releases/latest) provide standalone builds. See the [installation guide](docs/install.md) for optional media tools and platform notes.
+The npm package requires Node.js 24 or newer. Homebrew/core and the [macOS archives on GitHub Releases](https://github.com/rvbuilds/summarize/releases/latest) provide standalone builds. See the [installation guide](docs/install.md) for optional media tools and platform notes.
 
 ## Quick start
 
@@ -101,10 +101,10 @@ Read the [model guide](docs/llm.md), [automatic selection rules](docs/model-auto
 
 ## Library
 
-For programmatic extraction without the CLI dependency surface, install [`@steipete/summarize-core`](https://www.npmjs.com/package/@steipete/summarize-core):
+For programmatic extraction without the CLI dependency surface, install [`@rvbuilds/summarize-core`](https://www.npmjs.com/package/@rvbuilds/summarize-core):
 
 ```bash
-npm install @steipete/summarize-core
+npm install @rvbuilds/summarize-core
 ```
 
 The package exports focused content and prompt entry points. See the [core package README](packages/core/README.md) for usage.

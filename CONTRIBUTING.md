@@ -22,14 +22,14 @@ pnpm -s check
 
 ## Repository Layout
 
-- `packages/core`: `@steipete/summarize-core`, the programmatic library surface
+- `packages/core`: `@rvbuilds/summarize-core`, the programmatic library surface
 - `src`: CLI and daemon implementation
 - `apps/chrome-extension`: Chrome Side Panel and Firefox Sidebar extension
 - `tests`: CLI and core tests
 - `docs`: user and architecture documentation
 - `scripts`: build, documentation, and release tooling
 
-Apps should import `@steipete/summarize-core` rather than the CLI package.
+Apps should import `@rvbuilds/summarize-core` rather than the CLI package.
 
 ## Common Commands
 
@@ -106,4 +106,4 @@ Search existing issues first. Bug reports should include:
 - Expected and actual behavior
 - Relevant logs with secrets removed
 
-Use [GitHub Issues](https://github.com/steipete/summarize/issues) for bugs and focused feature requests.
+Use [GitHub Issues](https://github.com/rvbuilds/summarize/issues) for bugs and focused feature requests.

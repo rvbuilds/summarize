@@ -1,5 +1,5 @@
-import type { SummaryLength } from "@steipete/summarize-core";
-import { SUMMARY_LENGTH_SPECS } from "@steipete/summarize-core/prompts";
+import type { SummaryLength } from "@rvbuilds/summarize-core";
+import { SUMMARY_LENGTH_SPECS } from "@rvbuilds/summarize-core/prompts";
 import { render } from "preact";
 import { createPortal } from "preact/compat";
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";

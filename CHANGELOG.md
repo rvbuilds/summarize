@@ -343,7 +343,7 @@ loops) are now neutralized by a local patch with regression coverage.
 
 ### Fixes
 
-- Packaging: publish the CLI with a resolved `@steipete/summarize-core` dependency after `0.16.0` was published with workspace metadata.
+- Packaging: publish the CLI with a resolved `@rvbuilds/summarize-core` dependency after `0.16.0` was published with workspace metadata.
 
 ## 0.16.0 - 2026-05-21
 
@@ -472,7 +472,7 @@ loops) are now neutralized by a local patch with regression coverage.
 
 ### Features
 
-- Slides: support `--slides` for local video files in the main CLI and `summarize slides`, route local videos through the shared slide-aware flow, and document the local-file workflow (#149, thanks @steipete).
+- Slides: support `--slides` for local video files in the main CLI and `summarize slides`, route local videos through the shared slide-aware flow, and document the local-file workflow (#149, thanks @rvbuilds).
 - Models: add explicit `github-copilot/...` model support backed by GitHub Models, including shorthand ids like `github-copilot/gpt-5.4` and `GITHUB_TOKEN` / `GH_TOKEN` auth.
 - Models: add OpenCode as a first-class CLI provider across CLI flags, config, auto fallback, daemon picker/chat flows, and Chrome extension settings, while preserving existing OpenClaw behavior (#169, thanks @maciej).
 - CLI providers: add OpenClaw as a configurable CLI backend (`--cli openclaw`, `cli/openclaw/...`, `openclaw/...`) across config, daemon discovery, and docs (#165, thanks @yqf-ai).
@@ -498,9 +498,9 @@ loops) are now neutralized by a local patch with regression coverage.
 - Daemon models: gracefully fall back for unrecognized custom models when using proxy base URLs instead of crashing on undefined API metadata (#175, thanks @douo).
 - Docs/setup: switch Homebrew instructions from the old tap to the official `brew install summarize` formula, including the side-panel setup UI and release checklist (#172, thanks @zeldrisho).
 - Chrome extension: detect blank `userAgentData.platform` browsers like Vivaldi by falling back to `navigator.platform` before choosing OS-specific setup instructions (#158, thanks @bytrangle).
-- Firecrawl: reject `--firecrawl always` for YouTube URLs with an explicit guidance error instead of silently skipping Firecrawl on the transcript-first path (#145, thanks @steipete).
+- Firecrawl: reject `--firecrawl always` for YouTube URLs with an explicit guidance error instead of silently skipping Firecrawl on the transcript-first path (#145, thanks @rvbuilds).
 - YouTube: keep Gemini-only no-caption runs on the transcription path by forwarding the Google API key from the top-level URL flow into link-preview transcription config (#148, thanks @bytrangle).
-- Homebrew: make the tap formula fail clearly on Linux instead of installing a macOS binary, and add generator/test coverage for the macOS-only guard (#147, thanks @steipete).
+- Homebrew: make the tap formula fail clearly on Linux instead of installing a macOS binary, and add generator/test coverage for the macOS-only guard (#147, thanks @rvbuilds).
 - Maintenance: update the GitHub Pages workflow to `actions/configure-pages@v6` and `actions/deploy-pages@v5` (#182, thanks @dependabot).
 
 ## 0.12.0 - 2026-03-11
@@ -522,7 +522,7 @@ loops) are now neutralized by a local patch with regression coverage.
 - Chrome extension tests: add stronger YouTube slide E2E coverage for loaded images, summary-backed slide text, and switching between videos mid-analysis without stale slide-summary bleed.
 - Chrome extension: isolate slide-summary stream callbacks per run and harden Playwright settings hydration so late events no longer blank slide text when switching videos mid-analysis.
 - Transcription: add Gemini audio/video transcription support across direct media, podcast/RSS, and yt-dlp YouTube fallback, including Files API uploads for larger media plus new Gemini live coverage (#89).
-- npm packaging: publish CLI with `pnpm publish` so `@steipete/summarize-core` is version-pinned in published metadata (no `workspace:*` in registry package).
+- npm packaging: publish CLI with `pnpm publish` so `@rvbuilds/summarize-core` is version-pinned in published metadata (no `workspace:*` in registry package).
 - Slides: detect WezTerm as an iTerm-compatible terminal for inline slide images in `--slides` mode. (#133) — thanks @doodaaatimmy-creator.
 - CLI help: surface `summarize refresh-free` in `summarize help` output.
 - CLI: report CLI provider timeouts explicitly, including the duration, command, and a `--timeout` hint instead of collapsing them into generic exec failures (#100, thanks @christophsturm).
@@ -656,7 +656,7 @@ loops) are now neutralized by a local patch with regression coverage.
 - CLI: simplify media download labels (avoid “media, video” duplication).
 - Slides: cap auto slide targets at 6 by default for long videos.
 - Slides: render headline-style first lines as slide titles above the slide marker.
-- Media: refactor routing helpers and size policy (#48, thanks @steipete).
+- Media: refactor routing helpers and size policy (#48, thanks @rvbuilds).
 - Daemon: emit slides start/progress/done metadata in extended logging for easier debugging.
 - Prompts: allow straight quotes and encourage 1-2 short exact quotes when relevant.
 
@@ -698,7 +698,7 @@ loops) are now neutralized by a local patch with regression coverage.
 
 ### Breaking
 
-- ESM-only: `@steipete/summarize` + `@steipete/summarize-core` no longer support CommonJS `require()`; the CLI binary is now ESM.
+- ESM-only: `@rvbuilds/summarize` + `@rvbuilds/summarize-core` no longer support CommonJS `require()`; the CLI binary is now ESM.
 
 ### Highlights
 
@@ -722,7 +722,7 @@ loops) are now neutralized by a local patch with regression coverage.
 - Chrome Side Panel: add length + language controls (presets + custom), forwarded to the daemon.
 - Daemon API: `mode: "auto"` accepts both `url` + extracted page `text`; daemon picks the best pipeline (YouTube/podcasts/media → URL, otherwise prefer visible page text) with a fallback attempt.
 - Daemon/Chrome: stream extra run metadata (`inputSummary`, `modelLabel`) over SSE for richer panel status.
-- Core: expose lightweight URL helpers at `@steipete/summarize-core/content/url` (YouTube/Twitter/podcast/direct-media detection).
+- Core: expose lightweight URL helpers at `@rvbuilds/summarize-core/content/url` (YouTube/Twitter/podcast/direct-media detection).
 - Chrome Side Panel: new icon + extension `homepage_url` set to `summarize.sh`.
 - Providers: add configurable API base URLs (config + env) for OpenAI/Anthropic/Google/xAI (thanks @bunchjesse for the nudge).
 
@@ -748,13 +748,13 @@ loops) are now neutralized by a local patch with regression coverage.
 
 ### Fixed
 
-- Packaging: `@steipete/summarize-core` now ships a CJS build for `require()` consumers (fixes `pnpm dlx @steipete/summarize --help` and the published CLI runtime).
+- Packaging: `@rvbuilds/summarize-core` now ships a CJS build for `require()` consumers (fixes `pnpm dlx @rvbuilds/summarize --help` and the published CLI runtime).
 
 ## 0.7.0 - 2025-12-26
 
 ### Highlights
 
-- Packages: split into `@steipete/summarize-core` (library) + `@steipete/summarize` (CLI; depends on core). Versions are lockstep.
+- Packages: split into `@rvbuilds/summarize-core` (library) + `@rvbuilds/summarize` (CLI; depends on core). Versions are lockstep.
 - Streaming: scrollback-safe Markdown streaming (hybrid: line-by-line + block buffering for fenced code + tables). No cursor control, no full-frame redraws.
 - Output: Markdown rendering is automatic on TTY; use `--plain` for raw Markdown/text output.
 - Finish line: compact separators (`·`) and no duplicated `… words` when transcript stats are shown.
@@ -993,7 +993,7 @@ First public release.
 
 ### CLI
 
-- `summarize` CLI shipped via `@steipete/summarize` (plus optional library exports).
+- `summarize` CLI shipped via `@rvbuilds/summarize` (plus optional library exports).
 - Inputs: URL, local file path, or remote file URL (PDFs/images/audio/video/text).
 - Automatic map-reduce for large inputs.
 - Streaming output by default on TTY, with Markdown → ANSI rendering (via `markdansi`).

@@ -1,5 +1,5 @@
 import type http from "node:http";
-import { encodeSseEvent, type SseEvent } from "@steipete/summarize-core/runtime";
+import { encodeSseEvent, type SseEvent } from "@rvbuilds/summarize-core/runtime";
 
 export type BufferedSseChannel = {
   buffer: Array<{ event: SseEvent; bytes: number }>;

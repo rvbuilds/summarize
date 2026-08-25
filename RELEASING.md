@@ -1,4 +1,4 @@
-# Releasing `@steipete/summarize` (npm + Homebrew/Bun)
+# Releasing `@rvbuilds/summarize` (npm + Homebrew/Bun)
 
 Ship is **not done** until:
 
@@ -124,7 +124,7 @@ Goal:
 
 3. GitHub Release (when approved)
    - Push the annotated `v<ver>` tag. The Release workflow is the only supported publisher.
-   - Each Bun executable is signed after compilation with `Developer ID Application: Peter Steinberger (Y5PE65HELJ)`, identifier `com.steipete.summarize.cli`, hardened runtime, a trusted timestamp, and the two Bun JIT entitlements in `scripts/macos-release.entitlements`.
+   - Each Bun executable is signed after compilation with `Developer ID Application: Rudra Varma (Y5PE65HELJ)`, identifier `com.rvbuilds.summarize.cli`, hardened runtime, a trusted timestamp, and the two Bun JIT entitlements in `scripts/macos-release.entitlements`.
    - Apple notarization is submitted for each signed executable. Raw Mach-O files cannot carry stapled tickets, so both CI verifiers require `codesign --check-notarization -R=notarized` online.
    - The browser extension zips and npm tarballs contain no Mach-O and stay outside Apple signing.
    - Repository secrets are `MACOS_SIGNING_P12`, `MACOS_SIGNING_P12_PASSWORD`, `ASC_KEY_ID`, `ASC_ISSUER_ID`, and `ASC_PRIVATE_KEY_P8`. Never pass them to verifier jobs.

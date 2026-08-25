@@ -1,4 +1,4 @@
-import { resolveLocalDirectMediaSource } from "@steipete/summarize-core/content/local-file";
+import { resolveLocalDirectMediaSource } from "@rvbuilds/summarize-core/content/local-file";
 import type { ExtractedLinkContent } from "../content/index.js";
 import { extractYouTubeVideoId, isDirectVideoInput, isYouTubeUrl } from "../content/index.js";
 import { buildDirectSourceId, buildYoutubeSourceId } from "./source-id.js";

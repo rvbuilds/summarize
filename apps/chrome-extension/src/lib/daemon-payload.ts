@@ -1,7 +1,7 @@
 import type {
   SummarizeRequestBody,
   SummarizeRequestOverrides,
-} from "@steipete/summarize-core/runtime";
+} from "@rvbuilds/summarize-core/runtime";
 import type { Settings } from "./settings";
 import { isYouTubeWatchUrl } from "./youtube-url";
 

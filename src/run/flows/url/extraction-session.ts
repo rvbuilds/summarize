@@ -1,5 +1,5 @@
-import { fetchYoutubeSourceMetrics, NEGATIVE_TTL_MS } from "@steipete/summarize-core/content";
-import * as urlUtils from "@steipete/summarize-core/content/url";
+import { fetchYoutubeSourceMetrics, NEGATIVE_TTL_MS } from "@rvbuilds/summarize-core/content";
+import * as urlUtils from "@rvbuilds/summarize-core/content/url";
 import { buildExtractCacheKey } from "../../../cache.js";
 import {
   createLinkPreviewClient,

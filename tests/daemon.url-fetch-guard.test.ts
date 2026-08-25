@@ -1,4 +1,4 @@
-import { markFetchAsDnsPinned } from "@steipete/summarize-core/content";
+import { markFetchAsDnsPinned } from "@rvbuilds/summarize-core/content";
 import { describe, expect, it, vi } from "vitest";
 import {
   assertDaemonUrlFetchAllowed,

@@ -1,7 +1,7 @@
 import type {
   AgentToolCall as ToolCall,
   AgentToolResultMessage as ToolResultMessage,
-} from "@steipete/summarize-core/runtime";
+} from "@rvbuilds/summarize-core/runtime";
 import { hasDebuggerCapability } from "../lib/automation-capabilities";
 import { executeAskUserWhichElementTool } from "./ask-user-which-element";
 import { executeNavigateTool } from "./navigate";

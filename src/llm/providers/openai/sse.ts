@@ -1,4 +1,4 @@
-import { parseSseStream } from "@steipete/summarize-core/runtime";
+import { parseSseStream } from "@rvbuilds/summarize-core/runtime";
 import type { LlmTokenUsage } from "../../types.js";
 
 export async function* parseOpenAiSseJsonStream(

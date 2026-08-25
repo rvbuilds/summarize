@@ -18,7 +18,7 @@ export function installStepsHtml({
   platformKind: PlatformKind;
   showTroubleshooting?: boolean;
 }) {
-  const npmCmd = "npm i -g @steipete/summarize";
+  const npmCmd = "npm i -g @rvbuilds/summarize";
   const brewCmd = "brew install summarize";
   const daemonCmd = `summarize daemon install --token ${token} --port ${daemonPort}`;
   const isMac = platformKind === "mac";
@@ -145,7 +145,7 @@ export function wireSetupButtons({
   generateToken: () => string;
   renderSetup: (token: string) => void;
 }) {
-  const npmCmd = "npm i -g @steipete/summarize";
+  const npmCmd = "npm i -g @rvbuilds/summarize";
   const brewCmd = "brew install summarize";
   const daemonCmd = `summarize daemon install --token ${token} --port ${daemonPort}`;
   const isMac = platformKind === "mac";

@@ -28,7 +28,7 @@ importers:
       '@earendil-works/pi-ai':
         specifier: ^0.84.2
         version: 0.84.2(supports-color@10.2.2)(ws@8.21.3)(zod@4.4.3)
-      '@steipete/summarize-core':
+      '@rvbuilds/summarize-core':
         specifier: workspace:*
         version: link:packages/core
       bpe-lite:
@@ -98,7 +98,7 @@ importers:
       '@mozilla/readability':
         specifier: 0.6.0
         version: 0.6.0
-      '@steipete/summarize-core':
+      '@rvbuilds/summarize-core':
         specifier: workspace:*
         version: link:../../packages/core
       googlevideo:

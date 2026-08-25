@@ -2,7 +2,7 @@ import { createServer, type Server } from "node:http";
 import {
   attachDnsPinnedAddresses,
   fetchWithDnsPinnedAddresses,
-} from "@steipete/summarize-core/content";
+} from "@rvbuilds/summarize-core/content";
 import { afterEach, describe, expect, it } from "vitest";
 
 const servers: Server[] = [];

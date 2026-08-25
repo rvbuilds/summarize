@@ -1,5 +1,5 @@
 import type { Context } from "@earendil-works/pi-ai";
-import { formatTimestampMs, type TranscriptSegment } from "@steipete/summarize-core/content";
+import { formatTimestampMs, type TranscriptSegment } from "@rvbuilds/summarize-core/content";
 import { isOpenAiGpt5Model } from "../llm/generate-text-shared.js";
 import { completeOpenAiText, resolveOpenAiClientConfig } from "../llm/providers/openai.js";
 import type { LlmTokenUsage } from "../llm/types.js";

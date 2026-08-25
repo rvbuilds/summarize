@@ -2,7 +2,7 @@ import {
   assertNetworkTargetAllowed,
   createNetworkGuardedFetch,
   type NetworkLookup,
-} from "@steipete/summarize-core/content";
+} from "@rvbuilds/summarize-core/content";
 
 const TARGET_LABEL = "URL fetch target";
 

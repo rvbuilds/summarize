@@ -1,4 +1,4 @@
-import { isYouTubeVideoUrl } from "@steipete/summarize-core/content/url";
+import { isYouTubeVideoUrl } from "@rvbuilds/summarize-core/content/url";
 import type { BgToPanel, PanelCachePayload, PanelToBg } from "../../lib/panel-contracts";
 
 type PanelCacheSession = {

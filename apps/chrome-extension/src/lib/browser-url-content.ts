@@ -1,9 +1,9 @@
-import { extractBrowserHtmlContent } from "@steipete/summarize-core/content/browser-html";
+import { extractBrowserHtmlContent } from "@rvbuilds/summarize-core/content/browser-html";
 import {
   getNetworkAddressFamily,
   isBlockedNetworkAddress,
   isBlockedNetworkHostname,
-} from "@steipete/summarize-core/content/network-safety";
+} from "@rvbuilds/summarize-core/content/network-safety";
 
 const MAX_HTML_BYTES = 8_000_000;
 const MAX_REDIRECTS = 10;

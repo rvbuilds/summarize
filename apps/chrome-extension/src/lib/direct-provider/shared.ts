@@ -4,7 +4,7 @@ import {
   type AgentTool as Tool,
   type AgentToolCall as ToolCall,
   parseSseStream,
-} from "@steipete/summarize-core/runtime";
+} from "@rvbuilds/summarize-core/runtime";
 import { providerLabel, type DirectModelConfig } from "./config";
 
 export type DirectStreamEvent =

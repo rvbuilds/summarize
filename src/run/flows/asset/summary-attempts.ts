@@ -94,7 +94,7 @@ export async function buildAssetCliContext({
   args: SummarizeAssetArgs;
   attempts: ModelAttempt[];
   attachmentsCount: number;
-  summaryLengthTarget: import("@steipete/summarize-core").SummaryLength | { maxCharacters: number };
+  summaryLengthTarget: import("@rvbuilds/summarize-core").SummaryLength | { maxCharacters: number };
 }) {
   if (!attempts.some((attempt) => attempt.transport === "cli")) return null;
   if (attachmentsCount === 0) return null;

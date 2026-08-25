@@ -5,7 +5,7 @@ const mocks = vi.hoisted(() => ({
   resolveYoutubeAudioWithAndroidVr: vi.fn(),
 }));
 
-vi.mock("@steipete/summarize-core/content/youtube", () => ({
+vi.mock("@rvbuilds/summarize-core/content/youtube", () => ({
   resolveYoutubeAudioWithAndroidVr: mocks.resolveYoutubeAudioWithAndroidVr,
 }));
 

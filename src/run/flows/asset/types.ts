@@ -1,4 +1,4 @@
-import type { SummaryLength } from "@steipete/summarize-core";
+import type { SummaryLength } from "@rvbuilds/summarize-core";
 import type { CacheState } from "../../../cache.js";
 import type { CliProvider, SummarizeConfig } from "../../../config.js";
 import type { MediaCache } from "../../../content/index.js";

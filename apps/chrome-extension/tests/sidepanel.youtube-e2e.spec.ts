@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { coerceSummaryWithSlides } from "@steipete/summarize-core/slides";
+import { coerceSummaryWithSlides } from "@rvbuilds/summarize-core/slides";
 import {
   DAEMON_PORT,
   SLIDES_MAX,

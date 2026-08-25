@@ -1,4 +1,4 @@
-import { parseSseStream } from "@steipete/summarize-core/runtime";
+import { parseSseStream } from "@rvbuilds/summarize-core/runtime";
 import { readPresetOrCustomValue } from "../../lib/combo";
 import { daemonFetch } from "../../lib/daemon-fetch";
 import { daemonOrigin, getDaemonOrigin } from "../../lib/daemon-url";

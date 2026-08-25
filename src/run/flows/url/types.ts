@@ -1,4 +1,4 @@
-import type { SummaryLength } from "@steipete/summarize-core";
+import type { SummaryLength } from "@rvbuilds/summarize-core";
 import type { ExecutableRunModel } from "../../../application/model-runtime.js";
 import type { CacheState } from "../../../cache.js";
 import type {

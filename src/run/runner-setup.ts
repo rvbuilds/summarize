@@ -1,5 +1,5 @@
 import fs from "node:fs/promises";
-import { isDirectMediaUrl } from "@steipete/summarize-core/content/url";
+import { isDirectMediaUrl } from "@rvbuilds/summarize-core/content/url";
 import { clearCacheFiles, DEFAULT_CACHE_MAX_MB, resolveCachePath } from "../cache.js";
 import { loadSummarizeConfig, mergeConfigEnv } from "../config.js";
 import { formatVersionLine } from "../version.js";

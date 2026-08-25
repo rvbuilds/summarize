@@ -12,7 +12,7 @@ describe("sidepanel setup view", () => {
 
     expect(html).toContain("brew install summarize");
     expect(html).toContain("summarize daemon install --token token --port 9931");
-    expect(html).not.toContain("steipete/tap/summarize");
+    expect(html).not.toContain("rvbuilds/tap/summarize");
   });
 
   it("shows npm guidance for non-mac setup instead of the old tap warning", () => {
@@ -23,7 +23,7 @@ describe("sidepanel setup view", () => {
       platformKind: "linux",
     });
 
-    expect(html).toContain("npm i -g @steipete/summarize");
+    expect(html).toContain("npm i -g @rvbuilds/summarize");
     expect(html).toContain("NPM installs the CLI (requires Node.js).");
     expect(html).not.toContain("Homebrew tap is macOS-only.");
   });

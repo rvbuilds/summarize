@@ -5,9 +5,9 @@ ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 BINARY=${1:-}
 ARCH=${2:-}
 OFFICIAL_RELEASE=${SUMMARIZE_OFFICIAL_RELEASE:-0}
-IDENTIFIER=com.steipete.summarize.cli
+IDENTIFIER=com.rvbuilds.summarize.cli
 TEAM_ID=Y5PE65HELJ
-EXPECTED_AUTHORITY="Developer ID Application: Peter Steinberger ($TEAM_ID)"
+EXPECTED_AUTHORITY="Developer ID Application: Rudra Varma ($TEAM_ID)"
 ENTITLEMENTS="$ROOT/scripts/macos-release.entitlements"
 REQUIREMENT="identifier \"$IDENTIFIER\" and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] exists and certificate leaf[field.1.2.840.113635.100.6.1.13] exists and certificate leaf[subject.OU] = \"$TEAM_ID\""
 

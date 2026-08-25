@@ -1,4 +1,4 @@
-import { resolveYoutubeAudioWithAndroidVr } from "@steipete/summarize-core/content/youtube";
+import { resolveYoutubeAudioWithAndroidVr } from "@rvbuilds/summarize-core/content/youtube";
 import { SabrStream } from "googlevideo/sabr-stream";
 import { buildSabrFormat, EnabledTrackTypes } from "googlevideo/utils";
 import type { BrowserYoutubeMediaContext } from "../background/youtube-media";

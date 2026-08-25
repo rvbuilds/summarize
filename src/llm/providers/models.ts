@@ -24,7 +24,7 @@ export function resolveOpenAiModel({
   const headers = openaiConfig.isOpenRouter
     ? {
         ...(base?.headers ?? {}),
-        "HTTP-Referer": "https://github.com/steipete/summarize",
+        "HTTP-Referer": "https://github.com/rvbuilds/summarize",
         "X-Title": "summarize",
       }
     : openaiConfig.extraHeaders

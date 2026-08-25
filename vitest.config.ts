@@ -28,35 +28,35 @@ export function createVitestConfig({
     resolve: {
       alias: [
         {
-          find: /^@steipete\/summarize-core\/content$/,
+          find: /^@rvbuilds\/summarize-core\/content$/,
           replacement: resolve(rootDir, "packages/core/src/content/index.ts"),
         },
         {
-          find: /^@steipete\/summarize-core\/content\/url$/,
+          find: /^@rvbuilds\/summarize-core\/content\/url$/,
           replacement: resolve(rootDir, "packages/core/src/content/url.ts"),
         },
         {
-          find: /^@steipete\/summarize-core\/content\/youtube-captions$/,
+          find: /^@rvbuilds\/summarize-core\/content\/youtube-captions$/,
           replacement: resolve(rootDir, "packages/core/src/content/youtube-captions.ts"),
         },
         {
-          find: /^@steipete\/summarize-core\/prompts$/,
+          find: /^@rvbuilds\/summarize-core\/prompts$/,
           replacement: resolve(rootDir, "packages/core/src/prompts/index.ts"),
         },
         {
-          find: /^@steipete\/summarize-core\/language$/,
+          find: /^@rvbuilds\/summarize-core\/language$/,
           replacement: resolve(rootDir, "packages/core/src/language.ts"),
         },
         {
-          find: /^@steipete\/summarize-core\/ffmpeg$/,
+          find: /^@rvbuilds\/summarize-core\/ffmpeg$/,
           replacement: resolve(rootDir, "packages/core/src/ffmpeg.ts"),
         },
         {
-          find: /^@steipete\/summarize-core\/processes$/,
+          find: /^@rvbuilds\/summarize-core\/processes$/,
           replacement: resolve(rootDir, "packages/core/src/processes.ts"),
         },
         {
-          find: /^@steipete\/summarize-core$/,
+          find: /^@rvbuilds\/summarize-core$/,
           replacement: resolve(rootDir, "packages/core/src/index.ts"),
         },
       ],

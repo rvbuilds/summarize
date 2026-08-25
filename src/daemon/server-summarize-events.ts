@@ -1,4 +1,4 @@
-import type { SseSlidesData } from "@steipete/summarize-core/runtime";
+import type { SseSlidesData } from "@rvbuilds/summarize-core/runtime";
 import type { SummarizeEvent } from "../application/summarize-contracts.js";
 import { formatModelLabelForDisplay } from "../run/finish-line.js";
 import type { SlideExtractionResult, SlideSourceKind } from "../slides/index.js";

@@ -1,4 +1,4 @@
-import type { SummaryLength } from "@steipete/summarize-core";
+import type { SummaryLength } from "@rvbuilds/summarize-core";
 import type { OutputLanguage } from "../../../language.js";
 import type { Attachment } from "../../../llm/attachments.js";
 import { resolveOpenAiClientConfig } from "../../../llm/providers/openai.js";

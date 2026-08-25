@@ -1,4 +1,4 @@
-import { extractYouTubeVideoId, parseTimestampStringToMs } from "@steipete/summarize-core/content";
+import { extractYouTubeVideoId, parseTimestampStringToMs } from "@rvbuilds/summarize-core/content";
 import type { SpeakerAnchorConfig, SpeakerProfileConfig } from "../config.js";
 import type {
   ResolveSpeakerIdentificationInput,

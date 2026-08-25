@@ -11,7 +11,7 @@ CLI and daemon code remain adapters:
 
 - CLI resolves command flags, owns progress and terminal rendering, then invokes engine modules.
 - Daemon resolves request/config state, maps engine stream events to response chunks, and owns SSE/HTTP behavior.
-- Browser code continues to depend on `@steipete/summarize-core`, not the Node execution engine.
+- Browser code continues to depend on `@rvbuilds/summarize-core`, not the Node execution engine.
 
 ## Module map
 

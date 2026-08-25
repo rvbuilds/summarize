@@ -1,6 +1,6 @@
 import type http from "node:http";
 import type { AssistantMessage, Message } from "@earendil-works/pi-ai";
-import { encodeSseEvent, type SseEvent } from "@steipete/summarize-core/runtime";
+import { encodeSseEvent, type SseEvent } from "@rvbuilds/summarize-core/runtime";
 import type { CacheState } from "../cache.js";
 import { runWithProcessContext } from "../processes.js";
 import { type AgentCacheInput, readAgentHistory, writeAgentHistory } from "./agent-cache.js";

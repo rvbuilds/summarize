@@ -1,4 +1,4 @@
-import { isYouTubeVideoUrl, shouldPreferUrlMode } from "@steipete/summarize-core/content/url";
+import { isYouTubeVideoUrl, shouldPreferUrlMode } from "@rvbuilds/summarize-core/content/url";
 import { buildIdleSubtitle } from "../../lib/header";
 import type { PanelCachePayload } from "./panel-cache";
 import { applyPanelStateAction, type PanelStateAction } from "./panel-state-store";

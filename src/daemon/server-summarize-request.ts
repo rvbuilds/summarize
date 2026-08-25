@@ -1,5 +1,5 @@
 import type http from "node:http";
-import type { SummarizeRequestBody } from "@steipete/summarize-core/runtime";
+import type { SummarizeRequestBody } from "@rvbuilds/summarize-core/runtime";
 import { resolveRunOverrides, type RunOverrides } from "../run/run-settings.js";
 import type { SlideSettings } from "../slides/index.js";
 import { resolveSlideSettings } from "../slides/index.js";

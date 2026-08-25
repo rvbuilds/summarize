@@ -1,5 +1,5 @@
-import { isLocalFileUrl, resolveLocalFileMtime } from "@steipete/summarize-core/content/local-file";
-import { isDirectVideoInput } from "@steipete/summarize-core/content/url";
+import { isLocalFileUrl, resolveLocalFileMtime } from "@rvbuilds/summarize-core/content/local-file";
+import { isDirectVideoInput } from "@rvbuilds/summarize-core/content/url";
 import type { CacheMode, FetchLinkContentOptions } from "../../../content/index.js";
 
 type UrlFetchFlags = {

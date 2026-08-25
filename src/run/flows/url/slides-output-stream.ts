@@ -1,4 +1,4 @@
-import { createSlidesPresentationStream } from "@steipete/summarize-core/slides";
+import { createSlidesPresentationStream } from "@rvbuilds/summarize-core/slides";
 import { createMarkdownStreamer, render as renderMarkdownAnsi } from "markdansi";
 import type { SummaryStreamHandler } from "../../../engine/events.js";
 import { prepareMarkdownForTerminalStreaming } from "../../markdown.js";

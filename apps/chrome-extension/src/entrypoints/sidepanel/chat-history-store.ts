@@ -1,4 +1,4 @@
-import type { AgentMessage as Message } from "@steipete/summarize-core/runtime";
+import type { AgentMessage as Message } from "@rvbuilds/summarize-core/runtime";
 import { compactChatHistory, type ChatHistoryLimits } from "./chat-state";
 import { normalizePanelUrl } from "./session-policy";
 import type { ChatMessage } from "./types";

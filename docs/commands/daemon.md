@@ -25,7 +25,7 @@ If you only use the CLI, you don't need any of this.
 
 ### `install`
 
-Install or upgrade the autostart service, write `~/.summarize/daemon.json`, and register Chrome native host `com.steipete.summarize` on macOS/Linux.
+Install or upgrade the autostart service, write `~/.summarize/daemon.json`, and register Chrome native host `com.rvbuilds.summarize` on macOS/Linux.
 
 ```bash
 summarize daemon install --token <TOKEN>

@@ -1,7 +1,7 @@
 import {
   type AgentAssistantMessage as AssistantMessage,
   parseSseStream,
-} from "@steipete/summarize-core/runtime";
+} from "@rvbuilds/summarize-core/runtime";
 import { parseSseEvent } from "./runtime-contracts";
 
 type AgentJsonResponse = { ok?: boolean; assistant?: AssistantMessage; error?: string };

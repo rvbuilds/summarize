@@ -1,4 +1,4 @@
-import type { LinkPreviewProgressEvent } from "@steipete/summarize-core/content";
+import type { LinkPreviewProgressEvent } from "@rvbuilds/summarize-core/content";
 import {
   formatBytes,
   formatBytesPerSecond,

@@ -7,7 +7,7 @@ import { chromium, expect, firefox } from "@playwright/test";
 import type {
   AgentAssistantMessage as AssistantMessage,
   AgentMessage as Message,
-} from "@steipete/summarize-core/runtime";
+} from "@rvbuilds/summarize-core/runtime";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const consoleErrorAllowlist: RegExp[] = [];

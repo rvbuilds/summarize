@@ -2,7 +2,7 @@ import { readDaemonPolicy } from "./daemon-policy";
 
 declare const __SUMMARIZE_E2E_HTTP_TRANSPORT__: boolean;
 
-export const NATIVE_MESSAGING_HOST_NAME = "com.steipete.summarize";
+export const NATIVE_MESSAGING_HOST_NAME = "com.rvbuilds.summarize";
 export const DAEMON_BRIDGE_PORT_NAME = "summarize:daemon-native";
 const MAX_REQUEST_BODY_BYTES = 16 * 1024 * 1024;
 

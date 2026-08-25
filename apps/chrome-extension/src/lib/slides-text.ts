@@ -7,4 +7,4 @@ export {
   splitSlideTitleFromText,
   splitSummaryFromSlides,
   type SlideTimelineEntry,
-} from "@steipete/summarize-core/slides";
+} from "@rvbuilds/summarize-core/slides";

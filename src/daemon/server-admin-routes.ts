@@ -1,6 +1,6 @@
 import { promises as fs } from "node:fs";
 import http from "node:http";
-import { hasBundledFfmpegWasm } from "@steipete/summarize-core/ffmpeg";
+import { hasBundledFfmpegWasm } from "@rvbuilds/summarize-core/ffmpeg";
 import type { SummarizeConfig } from "../config.js";
 import type { DaemonLogger } from "../logging/daemon.js";
 import { buildModelPickerOptions } from "./models.js";

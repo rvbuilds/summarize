@@ -3,7 +3,7 @@ import {
   isBlockedNetworkAddress,
   isBlockedNetworkHostname,
   normalizeNetworkHostname,
-} from "@steipete/summarize-core/content";
+} from "@rvbuilds/summarize-core/content";
 import { describe, expect, it } from "vitest";
 
 describe("network safety policy", () => {

@@ -1,5 +1,5 @@
 {
-  "name": "@steipete/summarize",
+  "name": "@rvbuilds/summarize",
   "version": "0.21.11",
   "description": "Link → clean text → summary.",
   "bin": {
@@ -61,7 +61,7 @@
   },
   "dependencies": {
     "@earendil-works/pi-ai": "^0.84.2",
-    "@steipete/summarize-core": "workspace:*",
+    "@rvbuilds/summarize-core": "workspace:*",
     "bpe-lite": "^0.5.2",
     "commander": "^15.0.0",
     "file-type": "^22.0.2",

@@ -3,7 +3,7 @@ import type {
   ProcessHandle,
   ProcessObserver,
   ProcessRegistration,
-} from "@steipete/summarize-core/processes";
+} from "@rvbuilds/summarize-core/processes";
 
 type ProcessStatus = "running" | "exited" | "error";
 
