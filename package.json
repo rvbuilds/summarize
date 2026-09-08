@@ -73,13 +73,13 @@
     "undici": "8.10.0"
   },
   "devDependencies": {
-    "@types/node": "^24.13.3",
+    "@types/node": "^26.4.1",
     "@types/sanitize-html": "^2.16.1",
     "@vitest/coverage-v8": "^4.1.10",
     "happy-dom": "^20.11.2",
-    "oxc-parser": "^0.144.0",
-    "oxfmt": "0.63.0",
-    "oxlint": "^1.78.0",
+    "oxc-parser": "^0.148.0",
+    "oxfmt": "0.66.0",
+    "oxlint": "^1.81.0",
     "oxlint-tsgolint": "^7.0.2001",
     "typescript": "^7.0.2",
     "vitest": "^4.1.10"
