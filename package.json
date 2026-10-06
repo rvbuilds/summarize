@@ -60,29 +60,29 @@
     "typecheck": "pnpm -C packages/core typecheck && tsc -p tsconfig.build.json --noEmit"
   },
   "dependencies": {
-    "@earendil-works/pi-ai": "^0.84.2",
+    "@earendil-works/pi-ai": "^1.0.1",
     "@rvbuilds/summarize-core": "workspace:*",
     "bpe-lite": "^0.5.2",
     "commander": "^15.0.0",
-    "file-type": "^22.0.2",
+    "file-type": "^22.1.1",
     "json5": "^2.2.3",
-    "markdansi": "^0.3.3",
+    "markdansi": "^0.3.4",
     "mime": "^4.1.0",
-    "osc-progress": "^0.3.3",
-    "tokentally": "^0.1.4",
-    "undici": "8.10.0"
+    "osc-progress": "^0.3.4",
+    "tokentally": "^0.1.7",
+    "undici": "8.11.2"
   },
   "devDependencies": {
-    "@types/node": "^24.13.3",
-    "@types/sanitize-html": "^2.16.1",
-    "@vitest/coverage-v8": "^4.1.10",
-    "happy-dom": "^20.11.2",
-    "oxc-parser": "^0.144.0",
-    "oxfmt": "0.63.0",
-    "oxlint": "^1.78.0",
-    "oxlint-tsgolint": "^7.0.2001",
+    "@types/node": "^26.6.4",
+    "@types/sanitize-html": "^2.16.2",
+    "@vitest/coverage-v8": "^5.0.3",
+    "happy-dom": "^20.14.5",
+    "oxc-parser": "^0.152.0",
+    "oxfmt": "0.71.0",
+    "oxlint": "^1.86.0",
+    "oxlint-tsgolint": "^7.0.2003",
     "typescript": "^7.0.2",
-    "vitest": "^4.1.10"
+    "vitest": "^5.0.3"
   },
   "engines": {
     "node": ">=24"
